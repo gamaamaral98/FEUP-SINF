@@ -28,8 +28,8 @@ const styles = theme => ({
     color: theme.palette.common.white,
   },
   item: {
-    paddingTop: 1,
-    paddingBottom: 1,
+    paddingTop: '1em',
+    paddingBottom: '1em',
     color: 'rgba(255, 255, 255, 0.7)',
     '&:hover,&:focus': {
       backgroundColor: 'rgba(255, 255, 255, 0.08)',

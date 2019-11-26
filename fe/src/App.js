@@ -16,10 +16,6 @@ class App extends Component {
     return (
       <div className="App">
         <Paperbase>
-        <h1>Users</h1>
-        {this.state.users.map(user =>
-          <div key={user.id}>{user.username}</div>
-        )}
         </Paperbase>
       </div>
     );
