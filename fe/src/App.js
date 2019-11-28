@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
-import Paperbase from './theme/Paperbase';
-// import './App.css';
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
+import Stock from './views/Stock';
+import SalesOrders from './views/SalesOrders';
+import PurchaseOrders from './views/PurchaseOrders';
+import PickingWaves from './views/PickingWaves';
+import NotFound from './views/NotFound'
 
 const axios = require('axios');
 
@@ -14,10 +18,18 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <Paperbase>
-        </Paperbase>
-      </div>
+      <Router>
+        <div className="App">
+          <Switch>
+            <Route exact path="/"><Redirect to="/stock"/></Route>
+            <Route path="/stock" component={Stock}/>
+            <Route path="/sales" component={SalesOrders}/>
+            <Route path="/purchases" component={PurchaseOrders}/>
+            <Route path="/waves" component={PickingWaves}/>
+            <Route component={NotFound}/>
+          </Switch>
+        </div>
+      </Router>
     );
   }
 }

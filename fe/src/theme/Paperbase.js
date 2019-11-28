@@ -13,7 +13,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="">
+      <Link color="inherit" href="https://sigarra.up.pt/feup/pt/ucurr_geral.ficha_uc_view?pv_ocorrencia_id=436456">
         SodaSinf
       </Link>{' '}
       {new Date().getFullYear()}
@@ -162,7 +162,7 @@ const styles = {
 };
 
 function Paperbase(props) {
-  const { classes } = props;
+  const { classes, selecteditem } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -183,13 +183,16 @@ function Paperbase(props) {
             />
           </Hidden>
           <Hidden xsDown implementation="css">
-            <Navigator PaperProps={{ style: { width: drawerWidth } }} />
+            <Navigator 
+                PaperProps={{ style: { width: drawerWidth } }}
+                selecteditem={selecteditem}
+            />
           </Hidden>
         </nav>
         <div className={classes.app}>
           <Header onDrawerToggle={handleDrawerToggle} />
           <main className={classes.main}>
-            <Content />
+            <Content selecteditem={selecteditem}/>
           </main>
           <footer className={classes.footer}>
             <Copyright />

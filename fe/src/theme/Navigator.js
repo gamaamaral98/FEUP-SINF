@@ -11,12 +11,13 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import ListIcon from '@material-ui/icons/List';
+import { Link } from 'react-router-dom';
 
 const categories = [
-  { id: 'Stock', icon: <DashboardIcon />, active: true },
-  { id: 'Sales Orders', icon: <ShoppingCartIcon /> },
-  { id: 'Purchase Orders', icon: <MonetizationOnIcon /> },
-  { id: 'Picking Waves', icon: <ListIcon /> },
+  { id: 'Stock', icon: <DashboardIcon />, link: '/stock' },
+  { id: 'Sales Orders', icon: <ShoppingCartIcon />, link: '/sales' },
+  { id: 'Purchase Orders', icon: <MonetizationOnIcon />, link: '/purchases' },
+  { id: 'Picking Waves', icon: <ListIcon />, link: '/waves'},
 ];
 
 const styles = theme => ({
@@ -58,37 +59,44 @@ const styles = theme => ({
   divider: {
     marginTop: theme.spacing(2),
   },
+
+  link: {
+    textDecoration: 'none',
+  }
 });
 
-function Navigator(props) {
-  const { classes, ...other } = props;
+class Navigator extends React.Component {
 
-  return (
-    <Drawer variant="permanent" {...other}>
-      <List disablePadding>
-        <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>
-          SodaSinf
+  render() {    
+    const { classes, ...other } = this.props;
+    return (<Drawer variant="permanent" {...other}>
+    <List disablePadding>
+      <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>
+        SodaSinf
+      </ListItem>
+      {categories.map(({ id: childId, icon, link }) => (
+      <Link 
+        key={childId} 
+        to={link}
+        className={classes.link}
+      >
+        <ListItem 
+          key={childId} 
+          button 
+          className={clsx(classes.item, this.props.selecteditem === childId && classes.itemActiveItem)}
+        >
+          <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
+          <ListItemText classes={{
+            primary: classes.itemPrimary,
+          }}>
+            {childId}
+          </ListItemText>
         </ListItem>
-          {categories.map(({ id: childId, icon, active }) => (
-            <ListItem
-              key={childId}
-              button
-              className={clsx(classes.item, active && classes.itemActiveItem)}
-            >
-              <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
-              <ListItemText
-                classes={{
-                  primary: classes.itemPrimary,
-                }}
-              >
-                {childId}
-              </ListItemText>
-            </ListItem>
-          ))}
-        ))}
-      </List>
-    </Drawer>
-  );
+      </Link>))}
+    ))}
+    </List>
+  </Drawer>);
+  }
 }
 
 Navigator.propTypes = {
