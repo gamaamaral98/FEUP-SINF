@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "PORT=3001 node bin/www",
-    "nodemon": "nodemon --exec npm start"
+    "server": "PORT=3001 node bin/www",
+    "start": "nodemon --exec npm run server"
   },
   "dependencies": {
     "axios": "^0.19.0",
