@@ -1,4 +1,5 @@
 const {token, saveToken, destroyToken} = require('./utils');
+const axios = require('axios');
 
 const interceptor = axios.interceptors.response.use(
   response => response,
