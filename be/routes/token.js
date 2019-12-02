@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var { token, saveToken } = require('../utils');
+var { token, saveToken } = require('../utils/utils');
 
 router.get('/', function(req, res, next) {
     token()
