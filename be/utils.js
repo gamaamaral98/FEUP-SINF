@@ -20,6 +20,30 @@ const request = (method, url, data) => {
     })
 }
 
+const token = () => {
+    const data = {
+        grant_type: 'client_credentials',
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        scope: 'application',
+    };
+
+    return request('post', 'https://identity.primaverabss.com/connect/token', data);
+}
+
+const saveToken = (token) => {
+    console.log("Access token updated!" )
+    axios.defaults.headers.common = {'Authorization': `Bearer ${token}`};
+}
+
+const destroyToken = () => {
+    console.log("Access token removed!" )
+    axios.defaults.headers.common = {'Authorization': ''};
+}
+
 module.exports = {
-    request
+    request,
+    token,
+    saveToken,
+    destroyToken
 }
