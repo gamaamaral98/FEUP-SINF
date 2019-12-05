@@ -93,7 +93,6 @@ class Navigator extends React.Component {
           </ListItemText>
         </ListItem>
       </Link>))}
-    ))}
     </List>
   </Drawer>);
   }
