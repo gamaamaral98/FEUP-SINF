@@ -55,7 +55,7 @@ function Header(props) {
             </Hidden>
             <Grid item xs />
             <Grid item>
-              <Link className={classes.link} href="#" variant="body2">
+              <Link className={classes.link} href="/login" variant="body2">
                 Logout
               </Link>
             </Grid>
