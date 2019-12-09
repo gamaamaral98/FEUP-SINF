@@ -11,7 +11,7 @@ const getBodyData = (data) => {
 
 const request = (method, url, data) => {
     const bodyData = getBodyData(data);
-    
+
     return axios({
         baseURL: url,
         method: method,
