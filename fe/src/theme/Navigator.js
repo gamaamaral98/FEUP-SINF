@@ -14,7 +14,7 @@ import ListIcon from '@material-ui/icons/List';
 import { Link } from 'react-router-dom';
 
 const categories = [
-  { id: 'Stock', icon: <DashboardIcon />, link: '/stock' },
+  { id: 'Warehouse', icon: <DashboardIcon />, link: '/warehouse' },
   { id: 'Sales Orders', icon: <ShoppingCartIcon />, link: '/sales' },
   { id: 'Purchase Orders', icon: <MonetizationOnIcon />, link: '/purchases' },
   { id: 'Picking Waves', icon: <ListIcon />, link: '/waves'},
