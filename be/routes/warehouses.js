@@ -4,12 +4,12 @@ var { request } = require('../utils/utils');
 
 const url = process.env.URL;
 
-var stocks = () => {
+var warehouses = () => {
     return request('get', url + '/materialscore/materialsitems', null);
 }
 
 router.get('/', function(req, res, next) {
-    stocks()
+    warehouses()
     .then((r) => {
         res.json(r.data);
     })
