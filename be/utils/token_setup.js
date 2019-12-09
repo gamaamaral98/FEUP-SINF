@@ -1,30 +1,28 @@
 const {token, saveToken, destroyToken} = require('./utils');
 const axios = require('axios');
 
-const interceptor = axios.interceptors.response.use(
+axios.interceptors.response.use(
   response => response,
   error => {
-      // Reject promise if usual error
-      if (error.response.status !== 401) {
-          return Promise.reject(error);
-      }
+    // Reject promise if usual error
+    if (error.response.status !== 401) {
+        return Promise.reject(error);
+    }
 
-      /* 
-       * When response code is 401, try to refresh the token.
-       * Eject the interceptor so it doesn't loop in case
-       * token refresh causes the 401 response
-       */
-      axios.interceptors.response.eject(interceptor);
-
-      return token()
-      .then(response => {
-          saveToken();
-          error.response.config.headers['Authorization'] = 'Bearer ' + response.data.access_token;
-          return axios(error.response.config);
-      }).catch(error => {
-          destroyToken();
-          //this.router.push('/login');
-          return Promise.reject(error);
-      }).finally(createAxiosResponseInterceptor);
+    return token()
+    .then(response => {
+        saveToken(response.data.access_token);
+        error.config.headers['Authorization'] = 'Bearer ' + response.data.access_token;
+        console.log(error.config)
+        return axios.request(error.config);
+    }).catch(error => {
+        destroyToken();
+        return Promise.reject(error);
+    });
   }
 );
+
+axios.interceptors.request.use(
+    response => {console.log(response); return response},
+    error => {console.log(error); return error}
+)

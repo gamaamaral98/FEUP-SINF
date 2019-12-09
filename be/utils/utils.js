@@ -32,13 +32,13 @@ const token = () => {
 }
 
 const saveToken = (token) => {
-    console.log("Access token updated!" )
-    axios.defaults.headers.common = {'Authorization': `Bearer ${token}`};
+    console.log("Access token updated!");
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
 
 const destroyToken = () => {
-    console.log("Access token removed!" )
-    axios.defaults.headers.common = {'Authorization': ''};
+    console.log("Access token removed!");
+    axios.defaults.headers.common['Authorization'] = '';
 }
 
 module.exports = {
