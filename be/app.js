@@ -16,7 +16,7 @@ var tokenRouter = require('./routes/token');
 var loginRouter = require('./routes/login');
 var signupRouter = require('./routes/signup');
 var logoutRouter = require('./routes/logout');
-var warehouseRouter = require('./routes/warehouse');
+var warehouseRouter = require('./routes/warehouses');
 
 var app = express();
 
