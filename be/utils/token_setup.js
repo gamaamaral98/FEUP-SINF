@@ -13,16 +13,15 @@ axios.interceptors.response.use(
     .then(response => {
         saveToken(response.data.access_token);
         error.config.headers['Authorization'] = 'Bearer ' + response.data.access_token;
-        console.log(error.config)
         return axios.request(error.config);
-    }).catch(error => {
+    }).catch(e => {
         destroyToken();
-        return Promise.reject(error);
+        return Promise.reject(e);
     });
   }
 );
 
-axios.interceptors.request.use(
-    response => {console.log(response); return response},
-    error => {console.log(error); return error}
-)
+// axios.interceptors.request.use(
+//     response => {console.log(response); return response},
+//     error => {console.log(error); return error}
+// )
