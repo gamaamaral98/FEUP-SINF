@@ -23,13 +23,13 @@ const token = () => {
 }
 
 const saveToken = (token) => {
+    axios.defaults.headers['Authorization'] = `Bearer ${token}`;
     console.log("Access token updated!");
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
 
 const destroyToken = () => {
+    delete axios.defaults.headers['Authorization'];
     console.log("Access token removed!");
-    axios.defaults.headers.common['Authorization'] = '';
 }
 
 module.exports = {
