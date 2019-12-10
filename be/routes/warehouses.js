@@ -14,6 +14,7 @@ router.get('/', function(req, res, next) {
         res.json(r.data);
     })
     .catch((e) => {
+        console.log(e)
         res.json(e)
     });
 });
