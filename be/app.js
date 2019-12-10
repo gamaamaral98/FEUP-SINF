@@ -16,7 +16,7 @@ var tokenRouter = require('./routes/token');
 var loginRouter = require('./routes/login');
 var signupRouter = require('./routes/signup');
 var logoutRouter = require('./routes/logout');
-var warehouseRouter = require('./routes/warehouse');
+var warehouseRouter = require('./routes/warehouses');
 
 var app = express();
 
@@ -55,7 +55,7 @@ app.use('/token', requiresLogin, tokenRouter);
 app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
 app.use('/logout', requiresLogin, logoutRouter);
-app.use('/warehouse', warehouseRouter);
+app.use('/warehouses', warehouseRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -66,6 +66,9 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   res.status(err.status || 500).end(err.message);
 });
+
+const {token, saveToken} = require('./utils/utils');
+token().then(r => saveToken(r.data.access_token))
 
 require('./utils/token_setup');
 
