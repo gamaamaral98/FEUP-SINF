@@ -14,7 +14,7 @@ const styles = theme => ({
 class Content extends React.Component {
 
   render() {
-    const { classes, selecteditem, ...other } = this.props;
+    const { selecteditem } = this.props;
 
     if(selecteditem === "Warehouse") return(<Warehouse/>);
     else if(selecteditem === "Sales Orders") return(<Sales/>);

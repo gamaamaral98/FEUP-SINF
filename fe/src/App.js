@@ -7,16 +7,7 @@ import PurchaseOrders from './views/PurchaseOrders';
 import PickingWaves from './views/PickingWaves';
 import NotFound from './views/NotFound';
 
-const axios = require('axios');
-
 class App extends Component {
-  state = {users: []}
-
-  componentDidMount() {
-    axios.get('/users')
-      .then(users => this.setState({users: users.data}));
-  }
-
   render() {
     return (
       <Router>
