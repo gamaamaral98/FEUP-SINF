@@ -67,9 +67,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500).end(err.message);
 });
 
-const {token, saveToken} = require('./utils/utils');
-token().then(r => saveToken(r.data.access_token))
-
 require('./utils/token_setup');
 
 module.exports = app;
