@@ -90,7 +90,6 @@ export default function StickyHeadTable() {
             <TableBody>
               {salesLoading ? <CircularProgress/>
                 : sales && sales.map(sales => {
-                  console.log(sales)
                 return (
                   <div className={classes.root}>
                     <ExpansionPanel>
@@ -122,15 +121,16 @@ export default function StickyHeadTable() {
             </TableBody>
           </Table>
         </div>
-        <TablePagination
+        {sales === null ? <div/> :        
+         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          //count={sales.length}
+          count={sales.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
-        />
+        />}
       </Paper>
     );
 }

@@ -121,15 +121,16 @@ export default function StickyHeadTable() {
             </TableBody>
           </Table>
         </div>
-        <TablePagination
+        {purchases === null ? <div/> :        
+         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          //count={purchases.length}
+          count={purchases.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
-        />
+        />}
       </Paper>
     );
 }
