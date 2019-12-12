@@ -120,7 +120,8 @@ export default function StickyHeadTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-
+  if(warehousesLoading && setWarehousesItemsLoading) return(<CircularProgress/>)
+  else
   return (
     <Paper className={classes.root}>
       <div className={classes.tableWrapper}>

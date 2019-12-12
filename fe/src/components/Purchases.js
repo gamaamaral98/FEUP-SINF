@@ -70,64 +70,66 @@ export default function StickyHeadTable() {
     setPage(0);
   };
 
-  return (
-    <Paper className={classes.root}>
-      <div className={classes.tableWrapper}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-                <TableCell
-                  key={columns[0].id}
-                  align={columns[0].align}
-                  style={{ minWidth: columns[0].minWidth }}
-                >
-                  {columns[0].label}
-                </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {purchasesLoading ? <CircularProgress/>
-              : purchases && purchases.map(purchase => {
-              return (
-                <div className={classes.root}>
-                  <ExpansionPanel>
-                    <ExpansionPanelSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Typography className={classes.heading}>{purchase['naturalKey']}</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <Table className={classes.table} aria-label="simple table">
-                        <TableBody>
-                          {purchase['documentLines'].map(item => (
-                            <TableRow key={item['description']}>
-                              <TableCell component="th" scope="row">
-                                {item['description']}
-                              </TableCell>
-                              <TableCell align="right">{item['quantity']}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                </div>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </div>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        //count={purchases.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onChangePage={handleChangePage}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-      />
-    </Paper>
-  );
+  if(purchasesLoading) return(<CircularProgress/>)
+  else
+    return (
+      <Paper className={classes.root}>
+        <div className={classes.tableWrapper}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                  <TableCell
+                    key={columns[0].id}
+                    align={columns[0].align}
+                    style={{ minWidth: columns[0].minWidth }}
+                  >
+                    {columns[0].label}
+                  </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {purchasesLoading ? <CircularProgress/>
+                : purchases && purchases.map(purchase => {
+                return (
+                  <div className={classes.root}>
+                    <ExpansionPanel>
+                      <ExpansionPanelSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                      >
+                        <Typography className={classes.heading}>{purchase['naturalKey']}</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <Table className={classes.table} aria-label="simple table">
+                          <TableBody>
+                            {purchase['documentLines'].map(item => (
+                              <TableRow key={item['description']}>
+                                <TableCell component="th" scope="row">
+                                  {item['description']}
+                                </TableCell>
+                                <TableCell align="right">{item['quantity']}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                  </div>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          //count={purchases.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+        />
+      </Paper>
+    );
 }
