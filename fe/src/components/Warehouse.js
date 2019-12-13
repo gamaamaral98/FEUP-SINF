@@ -120,7 +120,7 @@ export default function StickyHeadTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  if(warehousesLoading && setWarehousesItemsLoading) return(<CircularProgress/>)
+  if(warehousesItems === null) return(<CircularProgress/>)
   else
   return (
     <Paper className={classes.root}>
@@ -138,8 +138,7 @@ export default function StickyHeadTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {warehousesItemsLoading ? <CircularProgress/>
-              : warehousesItems && warehousesItems.map(warehouseItem => {
+            {warehousesItems.map(warehouseItem => {
                 return(
                   <div className={classes.root}>
                     <ExpansionPanel>
@@ -171,17 +170,16 @@ export default function StickyHeadTable() {
             }
           </TableBody>
         </Table>
-      </div>
-      {warehousesItems === null ? <div/> :        
-         <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={warehousesItems.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
-        />}
+      </div>      
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
+        component="div"
+        count={warehousesItems.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
     </Paper>
   );
 }

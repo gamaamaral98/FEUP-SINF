@@ -70,7 +70,7 @@ export default function StickyHeadTable() {
     setPage(0);
   };
 
-  if(salesLoading) return(<CircularProgress/>)
+  if(sales === null) return(<CircularProgress/>)
   else
     return (
       <Paper className={classes.root}>
@@ -88,8 +88,7 @@ export default function StickyHeadTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {salesLoading ? <CircularProgress/>
-                : sales && sales.map(sales => {
+              {sales.map(sales => {
                 return (
                   <div className={classes.root}>
                     <ExpansionPanel>
@@ -120,8 +119,7 @@ export default function StickyHeadTable() {
               })}
             </TableBody>
           </Table>
-        </div>
-        {sales === null ? <div/> :        
+        </div>       
          <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
@@ -130,7 +128,7 @@ export default function StickyHeadTable() {
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
-        />}
+        />
       </Paper>
     );
 }

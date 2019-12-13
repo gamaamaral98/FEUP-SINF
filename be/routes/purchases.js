@@ -28,6 +28,7 @@ router.get('/', function(req, res, next) {
 		"SourceDocLineNumber": 1, 
 		"quantity": 100 
     }
+    A quantidade pode variar desde que não ultrapasse a quantidade definida na purchase order
 */
 var placeOnWarehouse = (data) => {
     return request('post', url + '/goodsreceipt/processOrders/' + company, data);
