@@ -61,6 +61,24 @@ export default function StickyHeadTable() {
       })
   }, []);
 
+  function CheckQuantity(props) {
+    const quantity = props.quantity;
+    const received = props.received;
+    const description = props.description;
+
+    if (quantity !== received) {
+      return <TableRow key={description}>
+        <TableCell component="th" scope="row"> {description} </TableCell>
+        <TableCell align="center">Received: {received} of {quantity}</TableCell>
+        <TableCell align="right">BUTTON</TableCell>
+      </TableRow>
+    }
+    return <TableRow key={description}>
+      <TableCell component="th" scope="row"> {description} </TableCell>
+      <TableCell align="right">Received: {received} of {quantity}</TableCell>
+    </TableRow>;
+  }
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -101,16 +119,11 @@ export default function StickyHeadTable() {
                       </ExpansionPanelSummary>
                       <ExpansionPanelDetails>
                         <Table className={classes.table} aria-label="simple table">
+                          {purchase['documentLines'].map(item => (
                           <TableBody>
-                            {purchase['documentLines'].map(item => (
-                              <TableRow key={item['description']}>
-                                <TableCell component="th" scope="row">
-                                  {item['description']}
-                                </TableCell>
-                                <TableCell align="right">{item['quantity']}</TableCell>
-                              </TableRow>
-                            ))}
+                            <CheckQuantity description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']}/>
                           </TableBody>
+                          ))}
                         </Table>
                       </ExpansionPanelDetails>
                     </ExpansionPanel>
