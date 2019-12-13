@@ -62,16 +62,30 @@ export default function StickyHeadTable() {
       })
   }, []);
 
+
+  function handleGenerateGoodsReceipt(naturalKey, orderNature, quantity){
+
+    axios.post('http://localhost:3001/purchases/entry', [{SourceDocKey: naturalKey, SourceDocLineNumber: orderNature, quantity: quantity}])
+      .then((res) => {
+        if(res.status === 200){
+          setPurchases(res.data);
+        }
+      })
+  }
+  
+
   function CheckQuantity(props) {
     const quantity = props.quantity;
     const received = props.received;
     const description = props.description;
+    const naturalKey = props.naturalKey;
+    const orderNature = props.orderNature;
 
     if (quantity !== received) {
       return <TableRow key={description}>
         <TableCell component="th" scope="row"> {description} </TableCell>
         <TableCell align="center">Received: {received} of {quantity}</TableCell>
-        <TableCell align="right"> <Button color="primary" onClick={() => { console.log('onClick'); }}> Generate Goods Receipt </Button></TableCell>
+        <TableCell align="right"> <Button color="primary" onClick={() => { handleGenerateGoodsReceipt(naturalKey, orderNature, quantity) }}> Generate Goods Receipt </Button></TableCell>
       </TableRow>
     }
     return <TableRow key={description}>
@@ -122,7 +136,7 @@ export default function StickyHeadTable() {
                         <Table className={classes.table} aria-label="simple table">
                           {purchase['documentLines'].map(item => (
                           <TableBody>
-                            <CheckQuantity description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']}/>
+                            <CheckQuantity description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']} orderNature={purchase['orderNature']}/>
                           </TableBody>
                           ))}
                         </Table>
