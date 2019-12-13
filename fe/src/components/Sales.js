@@ -37,29 +37,33 @@ export default function StickyHeadTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const [sales, setsales] = useState(null);
-  const [salesLoading, setsalesLoading] = useState(false);
+  const [sales, setsales] = useState([]);
+  const [salesLoading, setsalesLoading] = useState(true);
+  const [totalSales, setTotalSales] = useState(0);
+
 
   useEffect(() => {
 
     setsalesLoading(true);
 
-    axios.get('http://localhost:3001/sales')
+    axios.get(`http://localhost:3001/sales/page=${page+1}&pageSize=${rowsPerPage}`)
       .then((res) => {
+        setTotalSales(res.data.recordCount);
 
         setsalesLoading(false);
 
         let salesOrders = [];
-        for(let i = 0; i < res.data.length; i++){
-          salesOrders.push(res.data[i]);
+        for(let i = 0; i < res.data.data.length; i++){
+          salesOrders.push(res.data.data[i]);
         }
 
         setsales(salesOrders);
+
       })
       .catch((_) => {
         setsalesLoading(false);
       })
-  }, []);
+  }, [page, rowsPerPage]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -70,7 +74,7 @@ export default function StickyHeadTable() {
     setPage(0);
   };
 
-  if(sales === null) return(<CircularProgress/>)
+  if(salesLoading) return(<CircularProgress/>)
   else
     return (
       <Paper className={classes.root}>
@@ -121,9 +125,9 @@ export default function StickyHeadTable() {
           </Table>
         </div>       
          <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
+          rowsPerPageOptions={[1, 10, 25, 100]}
           component="div"
-          count={sales.length}
+          count={totalSales}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
