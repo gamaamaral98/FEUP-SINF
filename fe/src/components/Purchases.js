@@ -6,6 +6,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -70,7 +71,7 @@ export default function StickyHeadTable() {
       return <TableRow key={description}>
         <TableCell component="th" scope="row"> {description} </TableCell>
         <TableCell align="center">Received: {received} of {quantity}</TableCell>
-        <TableCell align="right">BUTTON</TableCell>
+        <TableCell align="right"> <Button color="primary" onClick={() => { console.log('onClick'); }}> Generate Goods Receipt </Button></TableCell>
       </TableRow>
     }
     return <TableRow key={description}>
