@@ -22,17 +22,19 @@ router.get('/', function(req, res, next) {
 
 /*
     Os parâmetros que têm de ir neste body têm este nome em cada purchase order: naturalKey, orderNature, quantity
+    Só tem de receber do frontend um array de jsons em que os json são por exemplo:
+    {
+		"SourceDocKey": "ECF.2019.2", 
+		"SourceDocLineNumber": 1, 
+		"quantity": 100 
+    }
 */
-var placeOnWarehouse = () => {
-    //HARDCODED PARA TESTAR SÓ
-    var data = [ { SourceDocKey: "ECF.2019.4", SourceDocLineNumber: 1, quantity: 200 } ];
-    
+var placeOnWarehouse = (data) => {
     return request('post', url + '/goodsreceipt/processOrders/' + company, data);
 }
 
 router.post('/entry', function(req, res, next) {
-    
-    placeOnWarehouse()
+    placeOnWarehouse(req.body)
     .then((r) => {
         res.json(r.data);
     })
