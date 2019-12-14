@@ -42,20 +42,23 @@ router.get('/page=:page&pageSize=:pageSize', function(req, res, next) {
     });
 });
 
-router.post('/entry', function(req, res, next) {
-    // placeOnWarehouse(req.body)
-    // .then((r) => {
-    //     purchases()
-    //     .then((r) => {
-    //         res.json(r.data);
-    //     })
-    //     .catch((e) => {
-    //         res.json(e);
-    //     });
-    // })
-    // .catch((e) => {
-    //     res.json(e);
-    // });
+router.post('/entry/page=:page&pageSize=:pageSize', function(req, res, next) {
+    placeOnWarehouse(req.body)
+    .then((r) => {
+        purchasesPaginated({
+            page: req.params.page,
+            pageSize: req.params.pageSize
+        })
+        .then((r) => {
+            res.json(r.data);
+        })
+        .catch((e) => {
+            res.json(e);
+        });
+    })
+    .catch((e) => {
+        res.json(e);
+    });
 });
 
 module.exports = router;

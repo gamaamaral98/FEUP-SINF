@@ -65,12 +65,12 @@ export default function StickyHeadTable() {
 
   function handleGenerateGoodsReceipt(naturalKey, orderNature, quantity){
 
-    // axios.post('http://localhost:3001/purchases/entry', [{SourceDocKey: naturalKey, SourceDocLineNumber: orderNature, quantity: quantity}])
-    //   .then((res) => {
-    //     if(res.status === 200){
-    //       setPurchases(res.data);
-    //     }
-    //   })
+    axios.post(`http://localhost:3001/purchases/entry/page=${page+1}&pageSize=${rowsPerPage}`, [{SourceDocKey: naturalKey, SourceDocLineNumber: orderNature, quantity: quantity}])
+      .then((res) => {
+        if(res.status === 200){
+          setPurchases(res.data.data);
+        }
+      })
   }
   
 
