@@ -41,6 +41,8 @@ export default function StickyHeadTable() {
   const [purchases, setPurchases] = useState(null);
   const [purchasesLoading, setPurchasesLoading] = useState(false);
 
+  var quantity = -1;
+
   useEffect(() => {
 
     setPurchasesLoading(true);
@@ -52,8 +54,23 @@ export default function StickyHeadTable() {
 
         let purchaseOrders = [];
         for(let i = 0; i < res.data.data.length; i++){
-          purchaseOrders.push(res.data.data[i]);
+
+          let aux = [];
+
+          for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
+            
+            if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
+              aux.push(res.data.data[i]['documentLines'][j]);
+            }
+
+          }
+
+          res.data.data[i]['documentLines'] = aux;
+            
+          if(aux.length !== 0) purchaseOrders.push(res.data.data[i]);
         }
+
+        purchaseOrders.reverse();
 
         setPurchases(purchaseOrders);
       })
@@ -63,12 +80,34 @@ export default function StickyHeadTable() {
   }, [page, rowsPerPage]);
 
 
-  function handleGenerateGoodsReceipt(naturalKey, orderNature, quantity){
+  function handleGenerateGoodsReceipt(event, naturalKey, item){
+    event.preventDefault();
+    const quantity = parseInt(event.target.quantity.value);
 
-    axios.post(`http://localhost:3001/purchases/entry/page=${page+1}&pageSize=${rowsPerPage}`, [{SourceDocKey: naturalKey, SourceDocLineNumber: orderNature, quantity: quantity}])
+    axios.post(`http://localhost:3001/purchases/entry/page=${page+1}&pageSize=${rowsPerPage}`, [{SourceDocKey: naturalKey, SourceDocLineNumber: item, quantity: quantity}])
       .then((res) => {
         if(res.status === 200){
-          setPurchases(res.data.data);
+          let purchaseOrders = [];
+          for(let i = 0; i < res.data.data.length; i++){
+  
+            let aux = [];
+  
+            for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
+              
+              if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
+                aux.push(res.data.data[i]['documentLines'][j]);
+              }
+  
+            }
+  
+            res.data.data[i]['documentLines'] = aux;
+              
+            if(aux.length !== 0) purchaseOrders.push(res.data.data[i]);
+          }
+  
+          purchaseOrders.reverse();
+  
+          setPurchases(purchaseOrders);
         }
       })
   }
@@ -79,13 +118,19 @@ export default function StickyHeadTable() {
     const received = props.received;
     const description = props.description;
     const naturalKey = props.naturalKey;
-    const orderNature = props.orderNature;
+    const item = props.itemNumber;
 
     if (quantity !== received) {
       return <TableRow key={description}>
         <TableCell component="th" scope="row"> {description} </TableCell>
         <TableCell align="center">Received: {received} of {quantity}</TableCell>
-        <TableCell align="right"> <Button color="primary" onClick={() => { handleGenerateGoodsReceipt(naturalKey, orderNature, quantity) }}> Generate Goods Receipt </Button></TableCell>
+        <TableCell align="right"> 
+          <form onSubmit={(e) => handleGenerateGoodsReceipt(e, naturalKey, item)}>
+            <label htmlFor="quantity">Enter quantity: </label>
+            <input name="quantity" type="text" />
+            <button>Generate Goods Receipt</button>
+          </form>
+        </TableCell>
       </TableRow>
     }
     return <TableRow key={description}>
@@ -121,7 +166,7 @@ export default function StickyHeadTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {purchases.map(purchase => {
+              {purchases.map((purchase, index) => {
                 return (
                   <div className={classes.root}>
                     <ExpansionPanel>
@@ -134,9 +179,10 @@ export default function StickyHeadTable() {
                       </ExpansionPanelSummary>
                       <ExpansionPanelDetails>
                         <Table className={classes.table} aria-label="simple table">
-                          {purchase['documentLines'].map(item => (
+
+                          {purchase['documentLines'].map((item, subIndex) =>(
                           <TableBody>
-                            <CheckQuantity description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']} orderNature={purchase['orderNature']}/>
+                            <CheckQuantity itemNumber={index+subIndex+1} description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']}/>
                           </TableBody>
                           ))}
                         </Table>
