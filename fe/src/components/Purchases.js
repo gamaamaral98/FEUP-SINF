@@ -45,14 +45,14 @@ export default function StickyHeadTable() {
 
     setPurchasesLoading(true);
 
-    axios.get('http://localhost:3001/purchases')
+    axios.get(`http://localhost:3001/purchases/page=${page+1}&pageSize=${rowsPerPage}`)
       .then((res) => {
 
         setPurchasesLoading(false);
 
         let purchaseOrders = [];
-        for(let i = 0; i < res.data.length; i++){
-          purchaseOrders.push(res.data[i]);
+        for(let i = 0; i < res.data.data.length; i++){
+          purchaseOrders.push(res.data.data[i]);
         }
 
         setPurchases(purchaseOrders);
@@ -60,17 +60,17 @@ export default function StickyHeadTable() {
       .catch((_) => {
         setPurchasesLoading(false);
       })
-  }, []);
+  }, [page, rowsPerPage]);
 
 
   function handleGenerateGoodsReceipt(naturalKey, orderNature, quantity){
 
-    axios.post('http://localhost:3001/purchases/entry', [{SourceDocKey: naturalKey, SourceDocLineNumber: orderNature, quantity: quantity}])
-      .then((res) => {
-        if(res.status === 200){
-          setPurchases(res.data);
-        }
-      })
+    // axios.post('http://localhost:3001/purchases/entry', [{SourceDocKey: naturalKey, SourceDocLineNumber: orderNature, quantity: quantity}])
+    //   .then((res) => {
+    //     if(res.status === 200){
+    //       setPurchases(res.data);
+    //     }
+    //   })
   }
   
 
@@ -149,7 +149,7 @@ export default function StickyHeadTable() {
           </Table>
         </div>      
          <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
+          rowsPerPageOptions={[1, 10, 25, 100]}
           component="div"
           count={purchases.length}
           rowsPerPage={rowsPerPage}
