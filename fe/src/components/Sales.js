@@ -34,6 +34,11 @@ const useStyles = makeStyles({
   button: {
     marginTop: "1em",
     float: "right",
+  },
+  stock: {
+    "&::before": {
+      content:'"Stock: "',
+    }
   }
 });
 
@@ -58,9 +63,11 @@ export default function StickyHeadTable() {
 
   const [sales, setsales] = useState([]);
   const [salesLoading, setsalesLoading] = useState(true);
+  const [items, setItems] = useState({});
+  const [itemsLoading, setItemsLoading] = useState(true);
   const [totalSales, setTotalSales] = useState(0);
   const [totalSelected, setTotalSelected] = useState(0);
-  const [selected, _] = useState([]);
+  const [selected] = useState([]);
 
 
   useEffect(() => {
@@ -86,6 +93,31 @@ export default function StickyHeadTable() {
       })
   }, [page, rowsPerPage]);
 
+  useEffect(() => {
+    setItemsLoading(true)
+
+    let promises = [];
+    for(let sale in sales) {
+      const dl = sales[sale].documentLines;
+      for(let item in dl) {
+        item = dl[item];
+        let key = item.salesItem;
+        if(!(key in items)) {
+          promises.push(axios.get(`http://localhost:3001/item/${key}`))
+        }
+      }
+    }
+    Promise.all(promises).then(values => {
+      let temp = {...items};
+      for(let res in values) {
+        const data = values[res].data
+        temp[data.itemKey] = data;
+      }
+      setItems(temp);
+      setItemsLoading(false)
+    })
+  }, [sales]);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -106,6 +138,7 @@ export default function StickyHeadTable() {
     }
     selected.push(s);
     setTotalSelected(totalSelected+1);
+    console.log(items)
   }
 
   if(salesLoading) return(<CircularProgress/>)
@@ -140,7 +173,8 @@ export default function StickyHeadTable() {
                     <ExpansionPanelDetails>
                       <Table className={classes.table} aria-label="simple table">
                         <TableBody>
-                          {sale['documentLines'].map(item => (
+                          {sale['documentLines'].map(item => {
+                            return (
                             <TableRow key={item.salesItem}>
                               <TableCell component="th" scope="row" key={item.salesItem}>
                               <FormControlLabel
@@ -151,11 +185,25 @@ export default function StickyHeadTable() {
                                 onChange={handleToggle(item.salesItem, item.quantity, sale.id)}
                                 label={item.description}
                                 checked = {selected.some(e => e.equals(new Selection(item.salesItem, item.quantity, sale.id)))}
+                                disabled={!(items[item.salesItem] && (items[item.salesItem]
+                                  .materialsItemWarehouses)
+                                  .find(({warehouseDescription}) => warehouseDescription != "Entry" && warehouseDescription != "Exit")
+                                  .stockBalance >= item.quantity)}
                               />
                               </TableCell>
-                              <TableCell align="right">{item.quantity}</TableCell>
+                              <TableCell align="right">
+                                Quantity {item.quantity} <br></br>
+                                {itemsLoading ?
+                                  <></> : items[item.salesItem] &&
+                                  <Typography variant="caption" className={classes.stock}>
+                                    {(items[item.salesItem]
+                                    .materialsItemWarehouses)
+                                    .find(({warehouseDescription}) => warehouseDescription != "Entry" && warehouseDescription != "Exit")
+                                    .stockBalance}
+                                  </Typography>}
+                              </TableCell>
                             </TableRow>
-                          ))}
+                          )})}
                         </TableBody>
                       </Table>
                     </ExpansionPanelDetails>
