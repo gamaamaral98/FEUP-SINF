@@ -5,6 +5,8 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,7 +14,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Button } from '@material-ui/core';
 
 const axios = require('axios');
 
@@ -29,8 +31,25 @@ const useStyles = makeStyles({
     maxHeight: 440,
     overflow: 'auto',
   },
+  button: {
+    marginTop: "1em",
+    float: "right",
+  }
 });
 
+class Selection {
+  constructor(product, quantity, sale) {
+    this.product = product;
+    this.quantity = quantity;
+    this.sale = sale;
+  }
+  
+  equals(other) {
+    return other.product === this.product 
+    && other.quantity === this.quantity
+    && other.sale === this.sale;
+  };
+}
 
 export default function StickyHeadTable() {
   const classes = useStyles();
@@ -40,6 +59,8 @@ export default function StickyHeadTable() {
   const [sales, setsales] = useState([]);
   const [salesLoading, setsalesLoading] = useState(true);
   const [totalSales, setTotalSales] = useState(0);
+  const [totalSelected, setTotalSelected] = useState(0);
+  const [selected, _] = useState([]);
 
 
   useEffect(() => {
@@ -74,9 +95,23 @@ export default function StickyHeadTable() {
     setPage(0);
   };
 
+  const handleToggle = (key, quantity, sale) => event => {
+    const s = new Selection(key, quantity, sale);
+    for(let i = 0; i < selected.length; i++) {
+      if(selected[i].equals(s)) {
+        selected.splice(i, 1);
+        setTotalSelected(totalSelected-1);
+        return;
+      }
+    }
+    selected.push(s);
+    setTotalSelected(totalSelected+1);
+  }
+
   if(salesLoading) return(<CircularProgress/>)
   else
     return (
+      <React.Fragment>
       <Paper className={classes.root}>
         <div className={classes.tableWrapper}>
           <Table stickyHeader aria-label="sticky table">
@@ -92,33 +127,39 @@ export default function StickyHeadTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {sales.map(sales => {
-                return (
-                  <div className={classes.root}>
-                    <ExpansionPanel>
-                      <ExpansionPanelSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                      >
-                        <Typography className={classes.heading}>{sales['naturalKey']}</Typography>
-                      </ExpansionPanelSummary>
-                      <ExpansionPanelDetails>
-                        <Table className={classes.table} aria-label="simple table">
-                          <TableBody>
-                            {sales['documentLines'].map(item => (
-                              <TableRow key={item['description']}>
-                                <TableCell component="th" scope="row">
-                                  {item['description']}
-                                </TableCell>
-                                <TableCell align="right">{item['quantity']}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </ExpansionPanelDetails>
-                    </ExpansionPanel>
-                  </div>
+              {sales.map(sale => {
+                 return (
+                  <ExpansionPanel className={classes.root}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1a-content"
+                      id="panel1a-header"
+                    >
+                      <Typography className={classes.heading}>{sale['naturalKey']}</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <Table className={classes.table} aria-label="simple table">
+                        <TableBody>
+                          {sale['documentLines'].map(item => (
+                            <TableRow key={item.salesItem}>
+                              <TableCell component="th" scope="row" key={item.salesItem}>
+                              <FormControlLabel
+                                aria-label="Acknowledge"
+                                onClick={event => event.stopPropagation()}
+                                onFocus={event => event.stopPropagation()}
+                                control={<Checkbox color="primary"/>}
+                                onChange={handleToggle(item.salesItem, item.quantity, sale.id)}
+                                label={item.description}
+                                checked = {selected.some(e => e.equals(new Selection(item.salesItem, item.quantity, sale.id)))}
+                              />
+                              </TableCell>
+                              <TableCell align="right">{item.quantity}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
                 );
               })}
             </TableBody>
@@ -134,5 +175,16 @@ export default function StickyHeadTable() {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
+      <Typography variant="overline" display="block" gutterBottom>
+        {totalSelected} items selected
+      </Typography>
+      <Button 
+      className={classes.button}
+      variant="contained"
+      color="primary"
+      disabled={totalSelected < 1}>
+        Create picking wave
+      </Button>
+      </React.Fragment>
     );
 }
