@@ -25,11 +25,13 @@ const parseSale = async (sale) => {
     await Promise.all(
         sale.documentLines.map(async documentLine => {
             let {data} = await get(`${host}/item/${documentLine.salesItem}`);
+            let stock = getItemStock(data); 
             let line = {
                 salesItem: documentLine.salesItem,
                 description: documentLine.description,
                 quantity: documentLine.quantity,
-                stock: getItemStock(data),
+                stockBalance: stock,
+                enoughStock: stock >= documentLine.quantity
             }
             ret.documentLines.push(line);
         })
