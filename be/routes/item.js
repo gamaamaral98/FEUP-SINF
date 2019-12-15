@@ -31,7 +31,7 @@ parseResponse = data => {
 router.get('/:key', function(req, res, next) { 
     item(req.params.key)
     .then((r) => {
-        res.status(200).json(parseResponse(r.data));
+        res.json(parseResponse(r.data));
     })
     .catch((e) => {
         res.json(e);
