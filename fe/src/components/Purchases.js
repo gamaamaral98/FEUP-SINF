@@ -40,8 +40,8 @@ export default function StickyHeadTable() {
 
   const [purchases, setPurchases] = useState(null);
   const [purchasesLoading, setPurchasesLoading] = useState(false);
+  const [totalPurchases, setTotalPurchases] = useState(0);
 
-  var quantity = -1;
 
   useEffect(() => {
 
@@ -50,27 +50,27 @@ export default function StickyHeadTable() {
     axios.get(`http://localhost:3001/purchases/page=${page+1}&pageSize=${rowsPerPage}`)
       .then((res) => {
 
+        setTotalPurchases(res.data.recordCount);
         setPurchasesLoading(false);
 
         let purchaseOrders = [];
         for(let i = 0; i < res.data.data.length; i++){
 
-          let aux = [];
+          //let aux = [];
 
-          for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
+          //for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
             
-            if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
-              aux.push(res.data.data[i]['documentLines'][j]);
-            }
+            //if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
+              //aux.push(res.data.data[i]['documentLines'][j]);
+            //}
 
-          }
+          //}
 
-          res.data.data[i]['documentLines'] = aux;
+          //res.data.data[i]['documentLines'] = aux;
             
-          if(aux.length !== 0) purchaseOrders.push(res.data.data[i]);
+          //if(aux.length !== 0) 
+            purchaseOrders.push(res.data.data[i]);
         }
-
-        purchaseOrders.reverse();
 
         setPurchases(purchaseOrders);
       })
@@ -90,22 +90,21 @@ export default function StickyHeadTable() {
           let purchaseOrders = [];
           for(let i = 0; i < res.data.data.length; i++){
   
-            let aux = [];
+            //let aux = [];
   
-            for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
+            //for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
               
-              if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
-                aux.push(res.data.data[i]['documentLines'][j]);
-              }
+              //if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
+                //aux.push(res.data.data[i]['documentLines'][j]);
+              //}
   
-            }
+            //}
   
-            res.data.data[i]['documentLines'] = aux;
+            //res.data.data[i]['documentLines'] = aux;
               
-            if(aux.length !== 0) purchaseOrders.push(res.data.data[i]);
+            //if(aux.length !== 0) 
+              purchaseOrders.push(res.data.data[i]);
           }
-  
-          purchaseOrders.reverse();
   
           setPurchases(purchaseOrders);
         }
@@ -128,7 +127,7 @@ export default function StickyHeadTable() {
           <form onSubmit={(e) => handleGenerateGoodsReceipt(e, naturalKey, item)}>
             <label htmlFor="quantity">Enter quantity: </label>
             <input name="quantity" type="text" />
-            <button>Generate Goods Receipt</button>
+            <Button>Generate Goods Receipt</Button>
           </form>
         </TableCell>
       </TableRow>
@@ -166,7 +165,7 @@ export default function StickyHeadTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {purchases.map((purchase, index) => {
+              {purchases.map((purchase) => {
                 return (
                   <div className={classes.root}>
                     <ExpansionPanel>
@@ -180,9 +179,8 @@ export default function StickyHeadTable() {
                       <ExpansionPanelDetails>
                         <Table className={classes.table} aria-label="simple table">
 
-                          {purchase['documentLines'].map((item, subIndex) =>(
+                          {purchase['documentLines'].map((item) =>(
                           <TableBody>
-                            {item['index']+1}
                             <CheckQuantity itemNumber={item['index']+1} description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']}/>
                           </TableBody>
                           ))}
@@ -198,7 +196,7 @@ export default function StickyHeadTable() {
          <TablePagination
           rowsPerPageOptions={[1, 10, 25, 100]}
           component="div"
-          count={purchases.length}
+          count={totalPurchases}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
