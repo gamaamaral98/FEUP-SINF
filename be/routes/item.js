@@ -8,11 +8,30 @@ var item = (key) => {
     return request('get', `${url}/materialscore/materialsitems/${key}`, null);
 }
 
-router.get('/:key', function(req, res, next) {
-    
+parseResponse = data => {
+    let ret = {
+        itemKey: data.itemKey,
+        description: data.description,
+        materialsItemWarehouses: [],
+    }
+
+    for(let warehouse in data.materialsItemWarehouses) {
+        warehouse = data.materialsItemWarehouses[warehouse];
+        let w = {
+            warehouse: warehouse.warehouse,
+            description: warehouse.warehouseDescription,
+            stockBalance: warehouse.stockBalance,
+        }
+        ret.materialsItemWarehouses.push(w);
+    }
+
+    return ret;
+}
+
+router.get('/:key', function(req, res, next) { 
     item(req.params.key)
     .then((r) => {
-        res.json(r.data);
+        res.status(200).json(parseResponse(r.data));
     })
     .catch((e) => {
         res.json(e);
