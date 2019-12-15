@@ -182,7 +182,8 @@ export default function StickyHeadTable() {
 
                           {purchase['documentLines'].map((item, subIndex) =>(
                           <TableBody>
-                            <CheckQuantity itemNumber={index+subIndex+1} description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']}/>
+                            {item['index']+1}
+                            <CheckQuantity itemNumber={item['index']+1} description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']}/>
                           </TableBody>
                           ))}
                         </Table>
