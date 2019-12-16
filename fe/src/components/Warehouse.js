@@ -71,6 +71,8 @@ export default function StickyHeadTable() {
     axios.get('http://localhost:3001/warehouses/items')
       .then((res) => {
 
+        console.log(res);
+
         setWarehousesItemsLoading(false);
 
         let tempWarehousesItems = [];
@@ -169,7 +171,6 @@ export default function StickyHeadTable() {
   else
   return (
     <React.Fragment>
-      <div className={classes.tableWrapper}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -206,8 +207,7 @@ export default function StickyHeadTable() {
               )
             })}
           </TableBody>
-        </Table>
-      </div>     
+        </Table>   
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"

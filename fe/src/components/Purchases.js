@@ -5,15 +5,13 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Button, TextField } from '@material-ui/core';
 
 const axios = require('axios');
 
@@ -25,10 +23,6 @@ const columns = [
 const useStyles = makeStyles({
   root: {
     width: '100%',
-  },
-  tableWrapper: {
-    maxHeight: 440,
-    overflow: 'auto',
   },
 });
 
@@ -55,20 +49,6 @@ export default function StickyHeadTable() {
 
         let purchaseOrders = [];
         for(let i = 0; i < res.data.data.length; i++){
-
-          //let aux = [];
-
-          //for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
-            
-            //if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
-              //aux.push(res.data.data[i]['documentLines'][j]);
-            //}
-
-          //}
-
-          //res.data.data[i]['documentLines'] = aux;
-            
-          //if(aux.length !== 0) 
             purchaseOrders.push(res.data.data[i]);
         }
 
@@ -81,6 +61,7 @@ export default function StickyHeadTable() {
 
 
   function handleGenerateGoodsReceipt(event, naturalKey, item){
+    console.log("HELLO");
     event.preventDefault();
     const quantity = parseInt(event.target.quantity.value);
 
@@ -89,27 +70,13 @@ export default function StickyHeadTable() {
         if(res.status === 200){
           let purchaseOrders = [];
           for(let i = 0; i < res.data.data.length; i++){
-  
-            //let aux = [];
-  
-            //for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
-              
-              //if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
-                //aux.push(res.data.data[i]['documentLines'][j]);
-              //}
-  
-            //}
-  
-            //res.data.data[i]['documentLines'] = aux;
-              
-            //if(aux.length !== 0) 
               purchaseOrders.push(res.data.data[i]);
           }
-  
+          setTotalPurchases(res.data.recordCount);
           setPurchases(purchaseOrders);
         }
       })
-  }
+  };
   
 
   function CheckQuantity(props) {
@@ -125,9 +92,8 @@ export default function StickyHeadTable() {
         <TableCell align="center">Received: {received} of {quantity}</TableCell>
         <TableCell align="right"> 
           <form onSubmit={(e) => handleGenerateGoodsReceipt(e, naturalKey, item)}>
-            <label htmlFor="quantity">Enter quantity: </label>
-            <input name="quantity" type="text" />
-            <button>Generate Goods Receipt</button>
+            <TextField label="Enter Quantity" name="quantity" type="text" />
+            <Button type="submit" style={{marginTop:"18px"}}>Generate Goods Receipt</Button>
           </form>
         </TableCell>
       </TableRow>
@@ -150,8 +116,7 @@ export default function StickyHeadTable() {
   if(purchases === null) return(<CircularProgress/>)
   else
     return (
-      <Paper className={classes.root}>
-        <div className={classes.tableWrapper}>
+      <React.Fragment>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -167,8 +132,7 @@ export default function StickyHeadTable() {
             <TableBody>
               {purchases.map((purchase) => {
                 return (
-                  <div className={classes.root}>
-                    <ExpansionPanel>
+                    <ExpansionPanel square className={classes.root}>
                       <ExpansionPanelSummary
                         expandIcon={<ExpandMoreIcon />}
                         aria-controls="panel1a-content"
@@ -181,27 +145,25 @@ export default function StickyHeadTable() {
 
                           {purchase['documentLines'].map((item) =>(
                           <TableBody>
-                            <CheckQuantity itemNumber={item['index']+1} description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']}/>
+                            <CheckQuantity itemNumber={item['index']} description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']}/>
                           </TableBody>
                           ))}
                         </Table>
                       </ExpansionPanelDetails>
                     </ExpansionPanel>
-                  </div>
                 );
               })}
             </TableBody>
-          </Table>
-        </div>      
+          </Table>  
          <TablePagination
           rowsPerPageOptions={[1, 10, 25, 100]}
           component="div"
-          count={totalPurchases}
+          count={totalPurchases ||0}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
-      </Paper>
+        </React.Fragment>
     );
 }
