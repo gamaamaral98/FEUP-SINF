@@ -5,7 +5,6 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -26,12 +25,7 @@ const useStyles = makeStyles({
   root: {
     width: '100%',
   },
-  tableWrapper: {
-    maxHeight: 440,
-    overflow: 'auto',
-  },
 });
-
 
 export default function StickyHeadTable() {
 
@@ -85,8 +79,10 @@ export default function StickyHeadTable() {
           tempWarehousesItems.push([warehouses[i], []]);
         }
         for(let i = 0; i < res.data.length; i++){
-  
+
           let description = res.data[i].description;
+          let itemID = res.data[i].itemKey;
+          let targetWarehouse = res.data[i].materialsItemWarehouses[1].warehouse;
   
           for(let k = 0; k < res.data[i].materialsItemWarehouses.length; k++){
   
@@ -98,7 +94,7 @@ export default function StickyHeadTable() {
 
                 if(tempWarehousesItems[j][0] === warehouseDescription){
 
-                  tempWarehousesItems[j][1].push([description, stockBalance]);
+                  tempWarehousesItems[j][1].push([itemID, description, stockBalance, targetWarehouse]);
                 }
               }
             }
@@ -112,6 +108,54 @@ export default function StickyHeadTable() {
       })
   }, [warehouses]);
 
+  function handleWarehouseTransfers(event, itemKey, targetWarehouse){
+    event.preventDefault();
+    const quantity = parseInt(event.target.quantity.value);
+
+    axios.post(`http://localhost:3001/warehouses/transfer`, {company:"DUDA", sourceWarehouse:"01", targetWarehouse:targetWarehouse, UnloadingCountry:"PT", documentLines:[{materialsItem:itemKey, quantity:quantity}]})
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  function CheckQuantity(props) {
+
+    const sourceWarehouse = props.warehouseSource;
+    const itemKey = props.itemKey;
+    const product = props.product;
+    const quantity = props.quantity;
+    const targetWarehouse = props.targetWarehouse;
+
+    if(sourceWarehouse==="Entry"){
+      return (
+        <TableRow key={itemKey}>
+          <TableCell component="th" scope="row">{product}</TableCell>
+          <TableCell align="center">{quantity}</TableCell>
+          <TableCell align="right"> 
+            <form onSubmit={(e) => handleWarehouseTransfers(e, itemKey, targetWarehouse)}>
+              <label htmlFor="quantity">Enter quantity: </label>
+              <input name="quantity" type="text" />
+              <button>Generate Warehouse Transfer</button>
+            </form>
+          </TableCell>
+        </TableRow>
+      );
+    }
+    else{
+      return (
+        <TableRow key={itemKey}>
+          <TableCell component="th" scope="row">
+            {product}
+          </TableCell>
+          <TableCell align="right">{quantity}</TableCell>
+        </TableRow>
+      );
+    }
+  }
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -120,10 +164,11 @@ export default function StickyHeadTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
   if(warehousesItems === null) return(<CircularProgress/>)
   else
   return (
-    <Paper className={classes.root}>
+    <React.Fragment>
       <div className={classes.tableWrapper}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -139,38 +184,30 @@ export default function StickyHeadTable() {
           </TableHead>
           <TableBody>
             {warehousesItems.map(warehouseItem => {
-                return(
-                  <div className={classes.root}>
-                    <ExpansionPanel>
-                      <ExpansionPanelSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                      >
-                        <Typography className={classes.heading}>{warehouseItem[0]}</Typography>
-                      </ExpansionPanelSummary>
-                      <ExpansionPanelDetails>
-                        <Table className={classes.table} aria-label="simple table">
-                          <TableBody>
-                            {warehouseItem[1].map(item => (
-                              <TableRow key={item[0]}>
-                                <TableCell component="th" scope="row">
-                                  {item[0]}
-                                </TableCell>
-                                <TableCell align="right">{item[1]}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </ExpansionPanelDetails>
-                    </ExpansionPanel>
-                  </div>
-                )
-              })
-            }
+              return(
+                <ExpansionPanel square className={classes.root}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography className={classes.heading}>{warehouseItem[0]}</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <Table className={classes.table} aria-label="simple table">
+                      {warehouseItem[1].map(item => (
+                        <TableBody>
+                          <CheckQuantity warehouseSource={warehouseItem[0]} itemKey={item[0]} product={item[1]} quantity={item[2]} targetWarehouse={item[3]}/>
+                        </TableBody>
+                      ))}
+                    </Table>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+              )
+            })}
           </TableBody>
         </Table>
-      </div>      
+      </div>     
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
@@ -180,6 +217,6 @@ export default function StickyHeadTable() {
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
-    </Paper>
+    </React.Fragment>
   );
 }

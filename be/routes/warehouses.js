@@ -12,6 +12,10 @@ var items = () => {
     return request('get', url + '/materialscore/materialsitems', null);
 }
 
+var transferItems = (data) => {
+    return request('post', url + '/materialsmanagement/stockTransferOrders', data)
+}
+
 router.get('/', function(req, res, next) {
     
     warehouses()
@@ -26,6 +30,17 @@ router.get('/', function(req, res, next) {
 router.get('/items', function(req, res, next) {
     
     items()
+    .then((r) => {
+        res.json(r.data);
+    })
+    .catch((e) => {
+        res.json(e);
+    });
+});
+
+router.post('/transfer', function(req, res, next) {
+    
+    transferItems(req.body)
     .then((r) => {
         res.json(r.data);
     })
