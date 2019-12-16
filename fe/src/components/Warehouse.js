@@ -11,7 +11,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Button, TextField } from '@material-ui/core';
 
 const axios = require('axios');
 
@@ -47,17 +47,7 @@ export default function StickyHeadTable() {
       .then((res) => {
 
         setWarehouseLoading(false);
-
-        let tempWarehouses = [];
-        for(let i = 0; i < res.data.length; i++){
-
-          if(res.data[i].warehouseKey !== "A0"){
-
-            tempWarehouses.push(res.data[i].description);
-          }
-        }
-
-        setWarehouses(tempWarehouses);
+        setWarehouses(res.data.data);
       })
       .catch((_) => {
         setWarehouseLoading(false);
@@ -71,8 +61,6 @@ export default function StickyHeadTable() {
     axios.get('http://localhost:3001/warehouses/items')
       .then((res) => {
 
-        console.log(res);
-
         setWarehousesItemsLoading(false);
 
         let tempWarehousesItems = [];
@@ -80,25 +68,15 @@ export default function StickyHeadTable() {
 
           tempWarehousesItems.push([warehouses[i], []]);
         }
-        for(let i = 0; i < res.data.length; i++){
+        for(let i = 0; i < res.data.data.length; i++){
+          for(let k = 0; k < tempWarehousesItems.length; k++){
+            if(tempWarehousesItems[k][0] === res.data.data[i][4]){
 
-          let description = res.data[i].description;
-          let itemID = res.data[i].itemKey;
-          let targetWarehouse = res.data[i].materialsItemWarehouses[1].warehouse;
-  
-          for(let k = 0; k < res.data[i].materialsItemWarehouses.length; k++){
-  
-            let stockBalance = res.data[i].materialsItemWarehouses[k].stockBalance;
-            if(stockBalance !== 0){
-
-              let warehouseDescription = res.data[i].materialsItemWarehouses[k].warehouseDescription;
-              for(let j = 0; j < tempWarehousesItems.length; j++){
-
-                if(tempWarehousesItems[j][0] === warehouseDescription){
-
-                  tempWarehousesItems[j][1].push([itemID, description, stockBalance, targetWarehouse]);
-                }
-              }
+              let itemID = res.data.data[i][0];
+              let description = res.data.data[i][1];
+              let targetWarehouse = res.data.data[i][2];
+              let stockBalance = res.data.data[i][3];
+              tempWarehousesItems[k][1].push([itemID, description, stockBalance, targetWarehouse]);
             }
           }
         }
@@ -138,9 +116,8 @@ export default function StickyHeadTable() {
           <TableCell align="center">{quantity}</TableCell>
           <TableCell align="right"> 
             <form onSubmit={(e) => handleWarehouseTransfers(e, itemKey, targetWarehouse)}>
-              <label htmlFor="quantity">Enter quantity: </label>
-              <input name="quantity" type="text" />
-              <button>Generate Warehouse Transfer</button>
+              <TextField label="Enter Quantity" name="quantity" type="text" />
+              <Button type="submit" style={{marginTop:"18px"}}>Generate Warehouse Transfer</Button>
             </form>
           </TableCell>
         </TableRow>
@@ -171,43 +148,43 @@ export default function StickyHeadTable() {
   else
   return (
     <React.Fragment>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-                <TableCell
-                  key={columns[0].id}
-                  align={columns[0].align}
-                  style={{ minWidth: columns[0].minWidth }}
+      <Table stickyHeader aria-label="sticky table">
+        <TableHead>
+          <TableRow>
+              <TableCell
+                key={columns[0].id}
+                align={columns[0].align}
+                style={{ minWidth: columns[0].minWidth }}
+              >
+                {columns[0].label}
+              </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {warehousesItems.map(warehouseItem => {
+            return(
+              <ExpansionPanel square className={classes.root}>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
                 >
-                  {columns[0].label}
-                </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {warehousesItems.map(warehouseItem => {
-              return(
-                <ExpansionPanel square className={classes.root}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                  >
-                    <Typography className={classes.heading}>{warehouseItem[0]}</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <Table className={classes.table} aria-label="simple table">
-                      {warehouseItem[1].map(item => (
-                        <TableBody>
-                          <CheckQuantity warehouseSource={warehouseItem[0]} itemKey={item[0]} product={item[1]} quantity={item[2]} targetWarehouse={item[3]}/>
-                        </TableBody>
-                      ))}
-                    </Table>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
-              )
-            })}
-          </TableBody>
-        </Table>   
+                  <Typography className={classes.heading}>{warehouseItem[0]}</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Table className={classes.table} aria-label="simple table">
+                    {warehouseItem[1].map(item => (
+                      <TableBody>
+                        <CheckQuantity warehouseSource={warehouseItem[0]} itemKey={item[0]} product={item[1]} quantity={item[2]} targetWarehouse={item[3]}/>
+                      </TableBody>
+                    ))}
+                  </Table>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            )
+          })}
+        </TableBody>
+      </Table>   
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
