@@ -88,7 +88,6 @@ router.get('/page=:page&pageSize=:pageSize', function(req, res, next) {
     });
 });
 
-//PROCESS ORDERS
 router.post('/processOrders', function(req, res, next){
     postProcessOrder(req.body)
     .then((r) => {

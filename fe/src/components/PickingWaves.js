@@ -28,6 +28,17 @@ const useStyles = makeStyles({
   }
 });
 
+function handlePickingWaves(event, items){
+  event.preventDefault();
+  
+  axios.post(`http://localhost:3001/sales/processOrders`, items)
+    .then((res) => {
+      if(res.status === 200){
+        console.log(res);
+      }
+    })
+};
+
 const PickingWaves = () => {
   const classes = useStyles();
   const [pickingWaves, setPickingWaves] = useState([]);
