@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -16,7 +15,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import { CircularProgress, Button } from '@material-ui/core';
 
-const axios = require('axios');
+const axios = require('axios').default;
 
 const columns = [
   { id: 'saleOrder', label: 'Sale\u00a0Order', minWidth: 170 },
@@ -26,10 +25,6 @@ const columns = [
 const useStyles = makeStyles({
   root: {
     width: '100%',
-  },
-  tableWrapper: {
-    maxHeight: 440,
-    overflow: 'auto',
   },
   button: {
     marginTop: "1em",
@@ -43,16 +38,19 @@ const useStyles = makeStyles({
 });
 
 class Selection {
-  constructor(product, quantity, sale) {
+  constructor(product, quantity, sale, warehouse, index) {
     this.product = product;
     this.quantity = quantity;
     this.sale = sale;
+    this.warehouse = warehouse;
+    this.index = index;
   }
   
   equals(other) {
     return other.product === this.product 
     && other.quantity === this.quantity
-    && other.sale === this.sale;
+    && other.sale === this.sale
+    && other.warehouse === this.warehouse
   };
 }
 
@@ -100,8 +98,8 @@ export default function StickyHeadTable() {
     setPage(0);
   };
 
-  const handleToggle = (key, quantity, sale) => event => {
-    const s = new Selection(key, quantity, sale);
+  const handleToggle = (key, quantity, sale, warehouse, index) => event => {
+    const s = new Selection(key, quantity, sale, warehouse, index);
     for(let i = 0; i < selected.length; i++) {
       if(selected[i].equals(s)) {
         selected.splice(i, 1);
@@ -114,15 +112,13 @@ export default function StickyHeadTable() {
   }
 
   const handlePickingWave = event => {
-    console.log(selected);
+    axios.post('http://localhost:3001/pickingWave/', selected)
   }
 
   if(salesLoading) return(<CircularProgress/>)
   else
     return (
       <React.Fragment>
-      <Paper className={classes.root}>
-        <div className={classes.tableWrapper}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -138,7 +134,7 @@ export default function StickyHeadTable() {
             <TableBody>
               {sales.map(sale => {
                  return (
-                  <ExpansionPanel className={classes.root}>
+                  <ExpansionPanel square className={classes.root}>
                     <ExpansionPanelSummary
                       expandIcon={<ExpandMoreIcon />}
                       aria-controls="panel1a-content"
@@ -158,9 +154,9 @@ export default function StickyHeadTable() {
                                 onClick={event => event.stopPropagation()}
                                 onFocus={event => event.stopPropagation()}
                                 control={<Checkbox color="primary"/>}
-                                onChange={handleToggle(item.salesItem, item.quantity, sale.id)}
+                                onChange={handleToggle(item.salesItem, item.quantity, sale.naturalKey, item.warehouse, item.index)}
                                 label={item.description}
-                                checked = {selected.some(e => e.equals(new Selection(item.salesItem, item.quantity, sale.id)))}
+                                checked = {selected.some(e => e.equals(new Selection(item.salesItem, item.quantity, sale.naturalKey, item.warehouse, item.index)))}
                                 disabled={!item.enoughStock}
                               />
                               </TableCell>
@@ -179,18 +175,16 @@ export default function StickyHeadTable() {
                 );
               })}
             </TableBody>
-          </Table>
-        </div>       
+          </Table>    
          <TablePagination
           rowsPerPageOptions={[1, 10, 25, 100]}
           component="div"
-          count={totalSales}
+          count={totalSales || 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
-      </Paper>
       <Typography variant="overline" display="block" gutterBottom>
         {totalSelected} items selected
       </Typography>
