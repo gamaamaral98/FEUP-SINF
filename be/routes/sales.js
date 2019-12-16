@@ -66,6 +66,7 @@ const parseResponse = async (data) => {
 }
 
 const postProcessOrder = (data) => {
+    console.log(data);
     return request('post', url + '/shipping/processOrders/' + company, data);
 }
 
