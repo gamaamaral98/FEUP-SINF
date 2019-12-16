@@ -17,6 +17,48 @@ var placeOnWarehouse = (data) => {
     return request('post', url + '/goodsreceipt/processOrders/' + company, data);
 }
 
+const parsePurchase = async (purchase) => {
+    let ret = {
+        naturalKey: purchase.naturalKey,
+        id: purchase.id,
+        documentLines: [],
+    };
+
+    if(!purchase.isActive || purchase.isDeleted) return ret;
+
+    await Promise.all(
+        purchase.documentLines.map(async documentLine => {
+            if(documentLine.receivedQuantity >= documentLine.quantity) return;
+            let line = {
+                index: documentLine.index+1,
+                description: documentLine.description,
+                quantity: documentLine.quantity,
+                receivedQuantity: documentLine.receivedQuantity
+            }
+            ret.documentLines.push(line);
+        })
+    )
+
+    return ret;
+}
+
+const parseResponse = async (data) => {
+    let ret = {
+        data: [],
+        recordCount : 0,
+        totalPages: data.totalPages,
+        prevPage: data.prevPage,
+    };
+
+    for(key in data.data) {
+        let purchase = await parsePurchase(data.data[key]);
+        if(purchase.documentLines.length === 0) continue;
+        ret.data.push(purchase);
+        ret.recordCount++;
+    }
+    return ret;
+}
+
 router.get('/', function(req, res, next) {
     
     purchases()
@@ -34,8 +76,10 @@ router.get('/page=:page&pageSize=:pageSize', function(req, res, next) {
         page: req.params.page,
         pageSize: req.params.pageSize
     })
-    .then((r) => {
-        res.json(r.data);
+    .then(async (r) => {
+        let ret = await(parseResponse(r.data))
+        res.json(ret);
+
     })
     .catch((e) => {
         res.json(e);
@@ -44,13 +88,15 @@ router.get('/page=:page&pageSize=:pageSize', function(req, res, next) {
 
 router.post('/entry/page=:page&pageSize=:pageSize', function(req, res, next) {
     placeOnWarehouse(req.body)
-    .then((r) => {
+    .then(async () => {
         purchasesPaginated({
             page: req.params.page,
             pageSize: req.params.pageSize
         })
-        .then((r) => {
-            res.json(r.data);
+        .then(async (r) => {
+            let ret = await(parseResponse(r.data))
+            res.json(ret);
+    
         })
         .catch((e) => {
             res.json(e);

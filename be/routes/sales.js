@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var { get } = require('../utils/utils');
+var { request, get } = require('../utils/utils');
 
 const url = process.env.URL;
 const host = process.env.HOST;
+const company = 'DUDA';
 
 const salesPaginated = ({page, pageSize}) => {
     return get(url + '/sales/orders', {page, pageSize});
@@ -64,6 +65,10 @@ const parseResponse = async (data) => {
     return ret; 
 }
 
+const postProcessOrder = (data) => {
+    return request('post', url + '/shipping/processOrders/' + company, data);
+}
+
 router.get('/page=:page&pageSize=:pageSize', function(req, res, next) {
     salesPaginated({
         page: req.params.page,
@@ -77,6 +82,17 @@ router.get('/page=:page&pageSize=:pageSize', function(req, res, next) {
             console.log(error)
         }
 
+    })
+    .catch((e) => {
+        res.json(e);
+    });
+});
+
+//PROCESS ORDERS
+router.post('/processOrders', function(req, res, next){
+    postProcessOrder(req.body)
+    .then((r) => {
+        res.json(r.data);
     })
     .catch((e) => {
         res.json(e);
