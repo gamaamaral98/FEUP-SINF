@@ -10,6 +10,7 @@ import Warehouse from "./views/Warehouse";
 import SalesOrders from "./views/SalesOrders";
 import PurchaseOrders from "./views/PurchaseOrders";
 import PickingWaves from "./views/PickingWaves";
+import PickingWaveDetails from "./views/PickingWaveDetails";
 import NotFound from "./views/NotFound";
 
 class App extends Component {
@@ -21,11 +22,17 @@ class App extends Component {
             <Route exact path="/">
               <Redirect to="/login" />
             </Route>
-            <Route path="/login" component={SignIn} />
-            <Route path="/warehouse" component={Warehouse} />
-            <Route path="/sales" component={SalesOrders} />
-            <Route path="/purchases" component={PurchaseOrders} />
-            <Route path="/waves" component={PickingWaves} />
+            <Route exact path="/login" component={SignIn} />
+            <Route exact path="/warehouse" component={Warehouse} />
+            <Route exact path="/sales" component={SalesOrders} />
+            <Route exact path="/purchases" component={PurchaseOrders} />
+            <Route exact path="/pickingWaves" component={PickingWaves} />
+            <Route exact path="/sales" component={SalesOrders} />
+            <Route
+              exact
+              path="/pickingWaves/:id"
+              component={PickingWaveDetails}
+            />
             <Route component={NotFound} />
           </Switch>
         </div>
