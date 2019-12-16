@@ -21,7 +21,6 @@ const User = UserModel(sequelize, Sequelize)
 const Product = ProductModel(sequelize, Sequelize)
 const PickingWave = PickingWaveModel(sequelize, Sequelize)
 PickingWave.hasMany(Product)
-Product.belongsTo(PickingWave)
 
 sequelize
 .authenticate()
