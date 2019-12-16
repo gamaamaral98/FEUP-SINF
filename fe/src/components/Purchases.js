@@ -76,11 +76,11 @@ export default function StickyHeadTable() {
           for(let i = 0; i < res.data.data.length; i++){
               purchaseOrders.push(res.data.data[i]);
           }
-  
+          setTotalPurchases(res.data.recordCount);
           setPurchases(purchaseOrders);
         }
       })
-  }
+  };
   
 
   function CheckQuantity(props) {
@@ -152,7 +152,7 @@ export default function StickyHeadTable() {
 
                           {purchase['documentLines'].map((item) =>(
                           <TableBody>
-                            <CheckQuantity itemNumber={item['index']+1} description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']}/>
+                            <CheckQuantity itemNumber={item['index']} description={item['description']} quantity={item['quantity']} received={item['receivedQuantity']} naturalKey={purchase['naturalKey']}/>
                           </TableBody>
                           ))}
                         </Table>
