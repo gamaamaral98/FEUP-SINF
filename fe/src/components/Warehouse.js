@@ -77,6 +77,8 @@ export default function StickyHeadTable() {
     axios.get('http://localhost:3001/warehouses/items')
       .then((res) => {
 
+        console.log(res);
+
         setWarehousesItemsLoading(false);
 
         let tempWarehousesItems = [];
@@ -139,6 +141,7 @@ export default function StickyHeadTable() {
           </TableHead>
           <TableBody>
             {warehousesItems.map(warehouseItem => {
+                //console.log(warehouseItem);
                 return(
                   <div className={classes.root}>
                     <ExpansionPanel>

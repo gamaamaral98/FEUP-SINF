@@ -6,7 +6,6 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -55,20 +54,6 @@ export default function StickyHeadTable() {
 
         let purchaseOrders = [];
         for(let i = 0; i < res.data.data.length; i++){
-
-          //let aux = [];
-
-          //for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
-            
-            //if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
-              //aux.push(res.data.data[i]['documentLines'][j]);
-            //}
-
-          //}
-
-          //res.data.data[i]['documentLines'] = aux;
-            
-          //if(aux.length !== 0) 
             purchaseOrders.push(res.data.data[i]);
         }
 
@@ -89,20 +74,6 @@ export default function StickyHeadTable() {
         if(res.status === 200){
           let purchaseOrders = [];
           for(let i = 0; i < res.data.data.length; i++){
-  
-            //let aux = [];
-  
-            //for(let j = 0; j < res.data.data[i]['documentLines'].length; j++){
-              
-              //if(res.data.data[i]['documentLines'][j]['quantity'] !== res.data.data[i]['documentLines'][j]['receivedQuantity']){
-                //aux.push(res.data.data[i]['documentLines'][j]);
-              //}
-  
-            //}
-  
-            //res.data.data[i]['documentLines'] = aux;
-              
-            //if(aux.length !== 0) 
               purchaseOrders.push(res.data.data[i]);
           }
   
