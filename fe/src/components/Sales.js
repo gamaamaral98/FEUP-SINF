@@ -13,7 +13,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
-import { CircularProgress, Button } from "@material-ui/core";
+import { CircularProgress, Button, FormHelperText } from "@material-ui/core";
 
 const axios = require("axios").default;
 
@@ -76,7 +76,7 @@ export default function StickyHeadTable() {
   const [pickingWavesLoading, setPickingWavesLoading] = useState(true);
   const [totalPickingWaves, setTotalPickingWaves] = useState(0);
   const [totalSelected, setTotalSelected] = useState(0);
-  const [selected] = useState([]);
+  const [selected, setSelected] = useState([]);
 
   useEffect(() => {
     setPickingWavesLoading(true);
@@ -142,6 +142,8 @@ export default function StickyHeadTable() {
 
   const handlePickingWave = event => {
     setTotalPickingWaves(totalPickingWaves + 1);
+    setSelected([]);
+    setTotalSelected(0);
     axios.post("http://localhost:3001/pickingWaves/", selected);
   };
 
@@ -213,11 +215,30 @@ export default function StickyHeadTable() {
                                   )}
                                   disabled={
                                     !item.enoughStock ||
-                                    !pickingWaves.some(
-                                      e => e.products.key === item.naturalKey
+                                    pickingWaves.some(e =>
+                                      e.products.some(
+                                        p =>
+                                          p.key === item.salesItem &&
+                                          p.sale === sale.naturalKey
+                                      )
                                     )
                                   }
                                 />
+                                <FormHelperText>
+                                  {pickingWaves.some(e =>
+                                    e.products.some(
+                                      p =>
+                                        p.key === item.salesItem &&
+                                        p.sale === sale.naturalKey
+                                    )
+                                  ) ? (
+                                    <Typography variant="caption">
+                                      Already in a picking wave
+                                    </Typography>
+                                  ) : (
+                                    ""
+                                  )}
+                                </FormHelperText>
                               </TableCell>
                               <TableCell align="right">
                                 Quantity {item.quantity}
