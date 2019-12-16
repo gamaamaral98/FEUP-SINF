@@ -26,6 +26,7 @@ const parsePurchase = async (purchase) => {
 
     await Promise.all(
         purchase.documentLines.map(async documentLine => {
+
             let line = {
                 index: documentLine.index+1,
                 description: documentLine.description,
