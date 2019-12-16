@@ -1,5 +1,7 @@
 const Sequelize = require('sequelize')
 const UserModel = require('./models/user')
+const PickingWaveModel = require('./models/pickingWave')
+const ProductModel = require('./models/product')
 
 const sequelize = new Sequelize('server', 'admin', 'sqladmin', {
     host: 'localhost',
@@ -16,6 +18,10 @@ const sequelize = new Sequelize('server', 'admin', 'sqladmin', {
 })
 
 const User = UserModel(sequelize, Sequelize)
+const Product = ProductModel(sequelize, Sequelize)
+const PickingWave = PickingWaveModel(sequelize, Sequelize)
+PickingWave.hasMany(Product)
+Product.belongsTo(PickingWave)
 
 sequelize
 .authenticate()
@@ -38,5 +44,7 @@ sequelize
 
 
 module.exports = {
-  User
+  User,
+  PickingWave,
+  Product,
 }

@@ -9,10 +9,10 @@ const salesPaginated = ({page, pageSize}) => {
     return get(url + '/sales/orders', {page, pageSize});
 }
 
-const getItemStock = item => {
+const getItemWarehouse = (item) => {
     return item
-    .materialsItemWarehouses.find(e => e.description !== 'Entry' && e.description !== 'Exit')
-    .stockBalance;
+    .materialsItemWarehouses
+    .find(e => e.description !== 'Entry' && e.description !== 'Exit');
 }
 
 const parseSale = async (sale) => {
@@ -25,18 +25,22 @@ const parseSale = async (sale) => {
     await Promise.all(
         sale.documentLines.map(async documentLine => {
             let {data} = await get(`${host}/item/${documentLine.salesItem}`);
-            let stock = getItemStock(data); 
+
+            let warehouse = getItemWarehouse(data);
+
             let line = {
                 salesItem: documentLine.salesItem,
                 description: documentLine.description,
                 quantity: documentLine.quantity,
-                stockBalance: stock,
-                enoughStock: stock >= documentLine.quantity
+                warehouse: warehouse.description,
+                stockBalance: warehouse.stockBalance,
+                enoughStock: warehouse.stockBalance >= documentLine.quantity,
+                index: documentLine.index + 1
             }
+            
             ret.documentLines.push(line);
         })
     )
-
     return ret;
 }
  
@@ -52,6 +56,7 @@ const parseResponse = async (data) => {
         let sale = await parseSale(data.data[key]);
         ret.data.push(sale);
     }
+
     return ret; 
 }
 
@@ -61,8 +66,12 @@ router.get('/page=:page&pageSize=:pageSize', function(req, res, next) {
         pageSize: req.params.pageSize
     })
     .then(async (r) => {
-        let ret = await(parseResponse(r.data))
-        res.json(ret);
+        try {
+            let ret = await(parseResponse(r.data))
+            res.json(ret);
+        } catch(error) {
+            console.log(error)
+        }
 
     })
     .catch((e) => {
