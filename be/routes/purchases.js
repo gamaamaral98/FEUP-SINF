@@ -22,11 +22,13 @@ const parsePurchase = async (purchase) => {
         naturalKey: purchase.naturalKey,
         id: purchase.id,
         documentLines: [],
-    }
+    };
+
+    if(!purchase.isActive || purchase.isDeleted) return ret;
 
     await Promise.all(
         purchase.documentLines.map(async documentLine => {
-
+            if(documentLine.receivedQuantity >= documentLine.quantity) return;
             let line = {
                 index: documentLine.index+1,
                 description: documentLine.description,
@@ -43,14 +45,16 @@ const parsePurchase = async (purchase) => {
 const parseResponse = async (data) => {
     let ret = {
         data: [],
-        recordCount : data.recordCount,
+        recordCount : 0,
         totalPages: data.totalPages,
         prevPage: data.prevPage,
     };
 
     for(key in data.data) {
         let purchase = await parsePurchase(data.data[key]);
+        if(purchase.documentLines.length === 0) continue;
         ret.data.push(purchase);
+        ret.recordCount++;
     }
     return ret;
 }

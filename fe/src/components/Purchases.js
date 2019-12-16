@@ -12,7 +12,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, FormControl, Input, Button, InputLabel, TextField } from '@material-ui/core';
 
 const axios = require('axios');
 
@@ -66,6 +66,7 @@ export default function StickyHeadTable() {
 
 
   function handleGenerateGoodsReceipt(event, naturalKey, item){
+    console.log("HELLO");
     event.preventDefault();
     const quantity = parseInt(event.target.quantity.value);
 
@@ -96,9 +97,8 @@ export default function StickyHeadTable() {
         <TableCell align="center">Received: {received} of {quantity}</TableCell>
         <TableCell align="right"> 
           <form onSubmit={(e) => handleGenerateGoodsReceipt(e, naturalKey, item)}>
-            <label htmlFor="quantity">Enter quantity: </label>
-            <input name="quantity" type="text" />
-            <button>Generate Goods Receipt</button>
+            <TextField label="Enter Quantity" name="quantity" type="text" />
+            <Button type="submit" style={{marginTop:"18px"}}>Generate Goods Receipt</Button>
           </form>
         </TableCell>
       </TableRow>
