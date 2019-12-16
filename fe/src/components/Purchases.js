@@ -127,7 +127,7 @@ export default function StickyHeadTable() {
           <form onSubmit={(e) => handleGenerateGoodsReceipt(e, naturalKey, item)}>
             <label htmlFor="quantity">Enter quantity: </label>
             <input name="quantity" type="text" />
-            <Button>Generate Goods Receipt</Button>
+            <button>Generate Goods Receipt</button>
           </form>
         </TableCell>
       </TableRow>
