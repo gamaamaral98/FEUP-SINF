@@ -26,10 +26,6 @@ const useStyles = makeStyles({
   root: {
     width: '100%',
   },
-  tableWrapper: {
-    maxHeight: 440,
-    overflow: 'auto',
-  },
 });
 
 
@@ -125,8 +121,7 @@ export default function StickyHeadTable() {
   if(warehousesItems === null) return(<CircularProgress/>)
   else
   return (
-    <Paper className={classes.root}>
-      <div className={classes.tableWrapper}>
+    <React.Fragment>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -141,10 +136,8 @@ export default function StickyHeadTable() {
           </TableHead>
           <TableBody>
             {warehousesItems.map(warehouseItem => {
-                //console.log(warehouseItem);
                 return(
-                  <div className={classes.root}>
-                    <ExpansionPanel>
+                    <ExpansionPanel square className={classes.root}>
                       <ExpansionPanelSummary
                         expandIcon={<ExpandMoreIcon />}
                         aria-controls="panel1a-content"
@@ -167,13 +160,11 @@ export default function StickyHeadTable() {
                         </Table>
                       </ExpansionPanelDetails>
                     </ExpansionPanel>
-                  </div>
                 )
               })
             }
           </TableBody>
-        </Table>
-      </div>      
+        </Table>   
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
@@ -183,6 +174,6 @@ export default function StickyHeadTable() {
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
-    </Paper>
+    </React.Fragment>
   );
 }
