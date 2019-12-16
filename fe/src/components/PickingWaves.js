@@ -38,7 +38,6 @@ const PickingWaves = () => {
     axios.get("http://localhost:3001/pickingWaves").then(r => {
       setPickingWavesLoading(false);
       setPickingWaves(r.data);
-      console.log(pickingWaves);
     });
   }, []);
 

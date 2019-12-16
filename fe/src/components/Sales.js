@@ -72,8 +72,20 @@ export default function StickyHeadTable() {
   const [sales, setsales] = useState([]);
   const [salesLoading, setsalesLoading] = useState(true);
   const [totalSales, setTotalSales] = useState(0);
+  const [pickingWaves, setPickingWaves] = useState([]);
+  const [pickingWavesLoading, setPickingWavesLoading] = useState(true);
+  const [totalPickingWaves, setTotalPickingWaves] = useState(0);
   const [totalSelected, setTotalSelected] = useState(0);
   const [selected] = useState([]);
+
+  useEffect(() => {
+    setPickingWavesLoading(true);
+    axios.get("http://localhost:3001/pickingWaves").then(r => {
+      setPickingWaves(r.data);
+      setTotalPickingWaves(r.data.length);
+      setPickingWavesLoading(false);
+    });
+  }, [totalPickingWaves]);
 
   useEffect(() => {
     setsalesLoading(true);
@@ -129,10 +141,11 @@ export default function StickyHeadTable() {
   };
 
   const handlePickingWave = event => {
+    setTotalPickingWaves(totalPickingWaves + 1);
     axios.post("http://localhost:3001/pickingWaves/", selected);
   };
 
-  if (salesLoading) return <CircularProgress />;
+  if (salesLoading || pickingWavesLoading) return <CircularProgress />;
   else
     return (
       <React.Fragment>
@@ -198,7 +211,12 @@ export default function StickyHeadTable() {
                                       )
                                     )
                                   )}
-                                  disabled={!item.enoughStock}
+                                  disabled={
+                                    !item.enoughStock ||
+                                    !pickingWaves.some(
+                                      e => e.products.key === item.naturalKey
+                                    )
+                                  }
                                 />
                               </TableCell>
                               <TableCell align="right">
