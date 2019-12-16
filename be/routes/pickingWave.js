@@ -25,6 +25,7 @@ router.get("/", async function(req, res, next) {
     pws.map(async pw => {
       let data = {
         id: pw.id,
+        state: pw.state,
         products: []
       };
       let ps = await pw.getProducts();
@@ -33,6 +34,7 @@ router.get("/", async function(req, res, next) {
           key: p.key,
           description: p.description,
           quantity: p.quantity,
+          pickedQuantity: p.pickedQuantity,
           sale: p.sale,
           warehouse: p.warehouse,
           index: p.index
