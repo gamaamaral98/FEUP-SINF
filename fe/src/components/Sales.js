@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -26,10 +25,6 @@ const columns = [
 const useStyles = makeStyles({
   root: {
     width: '100%',
-  },
-  tableWrapper: {
-    maxHeight: 440,
-    overflow: 'auto',
   },
   button: {
     marginTop: "1em",
@@ -124,8 +119,6 @@ export default function StickyHeadTable() {
   else
     return (
       <React.Fragment>
-      <Paper className={classes.root}>
-        <div className={classes.tableWrapper}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -141,7 +134,7 @@ export default function StickyHeadTable() {
             <TableBody>
               {sales.map(sale => {
                  return (
-                  <ExpansionPanel className={classes.root}>
+                  <ExpansionPanel square className={classes.root}>
                     <ExpansionPanelSummary
                       expandIcon={<ExpandMoreIcon />}
                       aria-controls="panel1a-content"
@@ -182,8 +175,7 @@ export default function StickyHeadTable() {
                 );
               })}
             </TableBody>
-          </Table>
-        </div>       
+          </Table>    
          <TablePagination
           rowsPerPageOptions={[1, 10, 25, 100]}
           component="div"
@@ -193,7 +185,6 @@ export default function StickyHeadTable() {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
-      </Paper>
       <Typography variant="overline" display="block" gutterBottom>
         {totalSelected} items selected
       </Typography>

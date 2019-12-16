@@ -18,7 +18,7 @@ router.post('/', function(req, res, next) {
 });
 
 router.get('/', function(req, res, next) {
-    PickingWave.findAll().then(r => console.log(r));
+    PickingWave.findAll().then(r => console.log(r.getProducts()));
 });
 
 module.exports = router;
