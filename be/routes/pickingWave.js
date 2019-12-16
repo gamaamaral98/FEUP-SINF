@@ -3,21 +3,22 @@ var router = express.Router();
 var { PickingWave, Product } = require('../db');
 
 router.post('/', function(req, res, next) {
-    const { username, password } = req.body;
-    console.log(req.body);
+    PickingWave.create()
+    .then(pw => {
+        req.body.map(e => {
+            Product.create({
+                key: e.product,
+                quantity: e.quantity,
+                sale: e.sale,
+                warehouse: e.warehouse,
+                index: e.index
+            }).then(p => pw.addProduct(p))
+        })
+    })
+});
 
-    // if (!username || !password) {
-    //     return res.status(400).send('Request missing username or password');
-    // }
-
-    // User.create({username, password})
-    // .then(user => {
-    //     req.session.user = user.dataValues;
-    //     res.status(201).send('Created');
-    // })
-    // .catch(error => {
-    //     res.status(400).end('Invalid username or password');
-    // });
+router.get('/', function(req, res, next) {
+    PickingWave.findAll().then(r => console.log(r));
 });
 
 module.exports = router;

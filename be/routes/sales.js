@@ -21,9 +21,13 @@ const parseSale = async (sale) => {
         id: sale.id,
         documentLines: [],
     };
+    
+    if(!sale.isActive || sale.isDeleted) return ret;
 
     await Promise.all(
         sale.documentLines.map(async documentLine => {
+            if(documentLine.deliveredQuantity >= documentLine.quantity) return;
+
             let {data} = await get(`${host}/item/${documentLine.salesItem}`);
 
             let warehouse = getItemWarehouse(data);
@@ -47,14 +51,14 @@ const parseSale = async (sale) => {
 const parseResponse = async (data) => {
     let ret = {
         data: [],
-        recordCount: data.recordCount,
-        totalPages: data.totalPages,
-        prevPage: data.prevPage,
+        recordCount: 0,
     };
 
     for(key in data.data) {
         let sale = await parseSale(data.data[key]);
+        if(sale.documentLines.length === 0) continue;
         ret.data.push(sale);
+        ret.recordCount++;
     }
 
     return ret; 
