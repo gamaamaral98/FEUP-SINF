@@ -20,6 +20,7 @@ const PickingWaveDetails = props => {
     const [pickingWave, setPickingWave] = useState(null);
     const [pickingWaveLoading, setPickingWaveLoading] = useState(true);
     const [picked] = useState({});
+    const [finished, setFinished] = useState(false)
 
     useEffect(() => {
         axios
@@ -48,11 +49,14 @@ const PickingWaveDetails = props => {
                 });
             }
         }
-        axios.put(`http://localhost:3001/pickingWaves/${props.id}`, data);
+        axios.put(`http://localhost:3001/pickingWaves/${props.id}`, data)
+        .then(() => setFinished(true))
+        
     };
 
     if (pickingWaveLoading) return <CircularProgress />;
     if (!pickingWave) return <Redirect to="/404" />;
+    if(finished) return <Redirect to="/pickingWaves"/>;
     return (
         <React.Fragment>
             <Table stickyHeader aria-label="sticky table">
