@@ -38,7 +38,9 @@ export default function StickyHeadTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const [purchases, setPurchases] = useState(null);
+  /*eslint-disable no-unused-vars*/
   const [purchasesLoading, setPurchasesLoading] = useState(false);
+  /*eslint-disable no-unused-vars*/
   const [totalPurchases, setTotalPurchases] = useState(0);
 
   const [open, setOpen] = React.useState(false);

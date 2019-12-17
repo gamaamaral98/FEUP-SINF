@@ -39,10 +39,14 @@ export default function StickyHeadTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const [warehouses, setWarehouses] = useState(null);
+  /*eslint-disable no-unused-vars*/
   const [warehousesLoading, setWarehouseLoading] = useState(false);
+  /*eslint-disable no-unused-vars*/
 
   const [warehousesItems, setWarehousesItems] = useState(null);
+  /*eslint-disable no-unused-vars*/
   const [warehousesItemsLoading, setWarehousesItemsLoading] = useState(false);
+  /*eslint-disable no-unused-vars*/
 
   const [open, setOpen] = React.useState(false);
   const [transition, setTransition] = React.useState(undefined);
@@ -99,7 +103,7 @@ export default function StickyHeadTable() {
     }
     for(let i = 0; i < tempWarehousesItems.length; i++){
 
-      if(tempWarehousesItems[i][1].length == 0 && tempWarehousesItems[i][0] !== "Entry" && tempWarehousesItems[i][0] !== "Exit"){
+      if(tempWarehousesItems[i][1].length === 0 && tempWarehousesItems[i][0] !== "Entry" && tempWarehousesItems[i][0] !== "Exit"){
         tempWarehousesItems.splice(i, 1);
         i--;
       }
