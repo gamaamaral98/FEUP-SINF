@@ -119,11 +119,6 @@ const PickingWaves = () => {
 
     axios
       .post(`http://localhost:3001/sales/processOrders`, selected)
-      // .then(res => {
-      //   if (res.status === 200) {
-      //     console.log(res);
-      //   }
-      // });
 
     for (let i = 0; i < selected.length; i++) {
       const s = selected[i];
@@ -195,7 +190,7 @@ const PickingWaves = () => {
                                 checked={selected.some(e =>
                                   e.equals(
                                     new Selection(
-                                      item.pickedQuantity,
+                                      item.pickedQuantity-item.shippedQuantity,
                                       item.sale,
                                       item.index
                                     )
@@ -227,7 +222,7 @@ const PickingWaves = () => {
                               </Typography>
                             </TableCell>
                             <TableCell align="right">
-                              Quantity: {item.quantity - item.pickedQuantity - item.shippedQuantity} <br></br>
+                              Quantity: {item.quantity - item.pickedQuantity} <br></br>
                             </TableCell>
                           </TableRow>
                         );

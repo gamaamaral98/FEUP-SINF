@@ -71,7 +71,7 @@ const PickingWaveDetails = props => {
                 </TableHead>
                 <TableBody style={{backgroundColor:"white"}}>
                     {pickingWave.products.map(product => {
-                        let missingQuant = product.quantity - product.pickedQuantity - product.shippedQuantity;
+                        let missingQuant = product.quantity - product.pickedQuantity;
                         return(
                             <TableRow key={product.description}>
                                 <TableCell component="th" scope="row">
@@ -99,7 +99,11 @@ const PickingWaveDetails = props => {
                 </TableBody>
             </Table>
             <form onSubmit={e => handleFinishPicking(e)}>
-                <Button type="submit" style={{ marginTop: "18px" }}>
+                <Button 
+                type="submit"
+                style={{ marginTop: "18px" }}
+                variant="contained"
+                color="primary">
                     Finished picking
                 </Button>
             </form>
