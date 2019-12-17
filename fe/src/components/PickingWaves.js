@@ -118,16 +118,16 @@ const PickingWaves = () => {
     });
 
     axios
-      .post(`http://localhost:3001/pickingWaves/processOrders`, selected)
-      .then(res => {
-        if (res.status === 200) {
-          console.log(res);
-        }
-      });
+      .post(`http://localhost:3001/sales/processOrders`, selected)
+      // .then(res => {
+      //   if (res.status === 200) {
+      //     console.log(res);
+      //   }
+      // });
 
     for (let i = 0; i < selected.length; i++) {
       const s = selected[i];
-      axios.put(`http://localhost:3001/pickingWaves/${s.pickingWave}/${s.key}/${s.sale}`, {
+      axios.put(`http://localhost:3001/pickingWaves/${s.pickingWave}/${s.key}/${s.sourceDocKey}`, {
         shippedQuantity: s.shippedQuantity+s.quantity
       })
     }
