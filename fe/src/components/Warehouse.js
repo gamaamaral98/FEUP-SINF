@@ -6,6 +6,8 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
+import Snackbar from '@material-ui/core/Snackbar';
+import Slide from '@material-ui/core/Slide';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
@@ -20,12 +22,15 @@ const columns = [
   { id: 'products', label: 'Products', minWidth: 100 },
 ];
 
-
 const useStyles = makeStyles({
   root: {
     width: '100%',
   },
 });
+
+function TransitionRight(props) {
+  return <Slide {...props} direction="right" />;
+}
 
 export default function StickyHeadTable() {
 
@@ -38,6 +43,9 @@ export default function StickyHeadTable() {
 
   const [warehousesItems, setWarehousesItems] = useState(null);
   const [warehousesItemsLoading, setWarehousesItemsLoading] = useState(false);
+
+  const [open, setOpen] = React.useState(false);
+  const [transition, setTransition] = React.useState(undefined);
 
   useEffect(() => {
 
@@ -109,6 +117,8 @@ export default function StickyHeadTable() {
 
           let tempWarehousesItems = handleWarehousesItems(res.data.data);
           setWarehousesItems(tempWarehousesItems);
+          setTransition(() => TransitionRight);
+          setOpen(true);
         }
       })
       .catch((e) => {
@@ -150,6 +160,10 @@ export default function StickyHeadTable() {
     }
   }
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -158,6 +172,7 @@ export default function StickyHeadTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
 
   if(warehousesItems === null) return(<CircularProgress/>)
   else
@@ -208,6 +223,15 @@ export default function StickyHeadTable() {
         page={page}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
+      <Snackbar
+      open={open}
+      onClose={handleClose}
+      TransitionComponent={transition}
+      ContentProps={{
+        'aria-describedby': 'message-id',
+      }}
+      message={<span id="message-id">Product Warehouse Transfer successful!</span>}
       />
     </React.Fragment>
   );
