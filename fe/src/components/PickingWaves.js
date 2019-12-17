@@ -71,7 +71,7 @@ const PickingWaves = () => {
     axios.get("http://localhost:3001/sales/orders").then(r => {
       setProcessGoodsLoading(false);
       let processes = [];
-      for(let i = 0; i < r.data.data.length; i++){
+      for (let i = 0; i < r.data.data.length; i++) {
         processes.push(r.data.data[i]);
       }
       setProcessGoods(processes);
@@ -97,24 +97,24 @@ const PickingWaves = () => {
       }
     }
     selected.push(s);
-    
+
     setTotalSelected(totalSelected + 1);
   };
 
   const handlePickingWaves = event => {
-    
     axios.get("http://localhost:3001/sales/orders").then(r => {
       setProcessGoodsLoading(false);
       let processes = [];
-      for(let i = 0; i < r.data.data.length; i++){
+      for (let i = 0; i < r.data.data.length; i++) {
         processes.push(r.data.data[i]);
       }
       setProcessGoods(processes);
     });
 
-    axios.post(`http://localhost:3001/sales/processOrders`, selected)
-      .then((res) => {
-        if(res.status === 200){
+    axios
+      .post(`http://localhost:3001/sales/processOrders`, selected)
+      .then(res => {
+        if (res.status === 200) {
           console.log(res);
         }
       });
@@ -143,19 +143,15 @@ const PickingWaves = () => {
                   id="panel1a-header"
                 >
                   <Typography className={classes.heading}>{pw.id}</Typography>
-                  {pw.state === "OPEN" ? (
-                    <Link
-                      className={classes.link}
-                      to={`/pickingWaves/${pw.id}`}
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <LinkMui variant="contained" color="primary">
-                        Start picking
-                      </LinkMui>
-                    </Link>
-                  ) : (
-                    ""
-                  )}
+                  <Link
+                    className={classes.link}
+                    to={`/pickingWaves/${pw.id}`}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <LinkMui variant="contained" color="primary">
+                      Start picking
+                    </LinkMui>
+                  </Link>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <Table className={classes.table} aria-label="simple table">
@@ -186,23 +182,24 @@ const PickingWaves = () => {
                                       item.sale,
                                       item.index
                                     )
-                                    )
-                                  )}
-                                  disabled={
-                                    !(processGoods.some(e =>
+                                  )
+                                )}
+                                disabled={
+                                  !processGoods.some(
+                                    e =>
                                       e.sourceDoc === item.sale &&
                                       e.item === item.key
-                                    )) || item.pickedQuantity === 0
-                                  }
-                                />
+                                  ) || item.pickedQuantity === 0
+                                }
+                              />
                               <FormHelperText>
-                                  {item.pickedQuantity === 0 ? (
-                                    <Typography variant="caption">
-                                      Items must be picked first!
-                                    </Typography>
-                                  ) : (
-                                    ""
-                                  )}
+                                {item.pickedQuantity === 0 ? (
+                                  <Typography variant="caption">
+                                    Items must be picked first!
+                                  </Typography>
+                                ) : (
+                                  ""
+                                )}
                               </FormHelperText>
                             </TableCell>
                             <TableCell>
