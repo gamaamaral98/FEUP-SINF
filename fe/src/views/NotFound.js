@@ -1,10 +1,8 @@
-import React from "react"
+import React from "react";
 import Paperbase from "../theme/Paperbase";
 
-const NotFound = () => {
-    return (
-        <Paperbase selecteditem="404"/>
-    );
-}
+const NotFound = props => {
+  return <Paperbase route={props} selecteditem="404" />;
+};
 
 export default NotFound;

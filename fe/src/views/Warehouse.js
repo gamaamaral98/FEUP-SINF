@@ -1,10 +1,8 @@
-import React from "react"
+import React from "react";
 import Paperbase from "../theme/Paperbase";
 
-const Warehouse = () => {
-    return (
-        <Paperbase selecteditem="Warehouse"/>
-    );
-}
+const Warehouse = props => {
+  return <Paperbase route={props} selecteditem="Warehouse" />;
+};
 
 export default Warehouse;

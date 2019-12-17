@@ -5,14 +5,13 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Button, TextField } from '@material-ui/core';
 
 const axios = require('axios');
 
@@ -27,7 +26,6 @@ const useStyles = makeStyles({
     width: '100%',
   },
 });
-
 
 export default function StickyHeadTable() {
 
@@ -49,17 +47,7 @@ export default function StickyHeadTable() {
       .then((res) => {
 
         setWarehouseLoading(false);
-
-        let tempWarehouses = [];
-        for(let i = 0; i < res.data.length; i++){
-
-          if(res.data[i].warehouseKey !== "A0"){
-
-            tempWarehouses.push(res.data[i].description);
-          }
-        }
-
-        setWarehouses(tempWarehouses);
+        setWarehouses(res.data.data);
       })
       .catch((_) => {
         setWarehouseLoading(false);
@@ -73,8 +61,6 @@ export default function StickyHeadTable() {
     axios.get('http://localhost:3001/warehouses/items')
       .then((res) => {
 
-        console.log(res);
-
         setWarehousesItemsLoading(false);
 
         let tempWarehousesItems = [];
@@ -82,23 +68,15 @@ export default function StickyHeadTable() {
 
           tempWarehousesItems.push([warehouses[i], []]);
         }
-        for(let i = 0; i < res.data.length; i++){
-  
-          let description = res.data[i].description;
-  
-          for(let k = 0; k < res.data[i].materialsItemWarehouses.length; k++){
-  
-            let stockBalance = res.data[i].materialsItemWarehouses[k].stockBalance;
-            if(stockBalance !== 0){
+        for(let i = 0; i < res.data.data.length; i++){
+          for(let k = 0; k < tempWarehousesItems.length; k++){
+            if(tempWarehousesItems[k][0] === res.data.data[i][4]){
 
-              let warehouseDescription = res.data[i].materialsItemWarehouses[k].warehouseDescription;
-              for(let j = 0; j < tempWarehousesItems.length; j++){
-
-                if(tempWarehousesItems[j][0] === warehouseDescription){
-
-                  tempWarehousesItems[j][1].push([description, stockBalance]);
-                }
-              }
+              let itemID = res.data.data[i][0];
+              let description = res.data.data[i][1];
+              let targetWarehouse = res.data.data[i][2];
+              let stockBalance = res.data.data[i][3];
+              tempWarehousesItems[k][1].push([itemID, description, stockBalance, targetWarehouse]);
             }
           }
         }
@@ -110,6 +88,53 @@ export default function StickyHeadTable() {
       })
   }, [warehouses]);
 
+  function handleWarehouseTransfers(event, itemKey, targetWarehouse){
+    event.preventDefault();
+    const quantity = parseInt(event.target.quantity.value);
+
+    axios.post(`http://localhost:3001/warehouses/transfer`, {company:"DUDA", sourceWarehouse:"01", targetWarehouse:targetWarehouse, UnloadingCountry:"PT", documentLines:[{materialsItem:itemKey, quantity:quantity}]})
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  function CheckQuantity(props) {
+
+    const sourceWarehouse = props.warehouseSource;
+    const itemKey = props.itemKey;
+    const product = props.product;
+    const quantity = props.quantity;
+    const targetWarehouse = props.targetWarehouse;
+
+    if(sourceWarehouse==="Entry"){
+      return (
+        <TableRow key={itemKey}>
+          <TableCell component="th" scope="row">{product}</TableCell>
+          <TableCell align="center">{quantity}</TableCell>
+          <TableCell align="right"> 
+            <form onSubmit={(e) => handleWarehouseTransfers(e, itemKey, targetWarehouse)}>
+              <TextField label="Enter Quantity" name="quantity" type="text" />
+              <Button type="submit" style={{marginTop:"18px"}}>Generate Warehouse Transfer</Button>
+            </form>
+          </TableCell>
+        </TableRow>
+      );
+    }
+    else{
+      return (
+        <TableRow key={itemKey}>
+          <TableCell component="th" scope="row">
+            {product}
+          </TableCell>
+          <TableCell align="right">{quantity}</TableCell>
+        </TableRow>
+      );
+    }
+  }
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -118,53 +143,48 @@ export default function StickyHeadTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
   if(warehousesItems === null) return(<CircularProgress/>)
   else
   return (
     <React.Fragment>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-                <TableCell
-                  key={columns[0].id}
-                  align={columns[0].align}
-                  style={{ minWidth: columns[0].minWidth }}
+      <Table stickyHeader aria-label="sticky table">
+        <TableHead>
+          <TableRow>
+              <TableCell
+                key={columns[0].id}
+                align={columns[0].align}
+                style={{ minWidth: columns[0].minWidth }}
+              >
+                {columns[0].label}
+              </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {warehousesItems.map(warehouseItem => {
+            return(
+              <ExpansionPanel square className={classes.root}>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
                 >
-                  {columns[0].label}
-                </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {warehousesItems.map(warehouseItem => {
-                return(
-                    <ExpansionPanel square className={classes.root}>
-                      <ExpansionPanelSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                      >
-                        <Typography className={classes.heading}>{warehouseItem[0]}</Typography>
-                      </ExpansionPanelSummary>
-                      <ExpansionPanelDetails>
-                        <Table className={classes.table} aria-label="simple table">
-                          <TableBody>
-                            {warehouseItem[1].map(item => (
-                              <TableRow key={item[0]}>
-                                <TableCell component="th" scope="row">
-                                  {item[0]}
-                                </TableCell>
-                                <TableCell align="right">{item[1]}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </ExpansionPanelDetails>
-                    </ExpansionPanel>
-                )
-              })
-            }
-          </TableBody>
-        </Table>   
+                  <Typography className={classes.heading}>{warehouseItem[0]}</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <Table className={classes.table} aria-label="simple table">
+                    {warehouseItem[1].map(item => (
+                      <TableBody>
+                        <CheckQuantity warehouseSource={warehouseItem[0]} itemKey={item[0]} product={item[1]} quantity={item[2]} targetWarehouse={item[3]}/>
+                      </TableBody>
+                    ))}
+                  </Table>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            )
+          })}
+        </TableBody>
+      </Table>   
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"

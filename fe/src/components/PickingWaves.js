@@ -13,18 +13,20 @@ import TableRow from "@material-ui/core/TableRow";
 import axios from "axios";
 import { CircularProgress, Button, FormControlLabel, Checkbox } from "@material-ui/core";
 
+
 const useStyles = makeStyles({
   root: {
     width: "100%"
   },
-  button: {
-    marginTop: "1em",
-    float: "right"
-  },
   heading: {
+    marginTop: "auto",
+    marginBottom: "auto",
     "&::before": {
       content: '"PickingWave#"'
     }
+  },
+  button: {
+    marginLeft: "auto"
   }
 });
 
@@ -104,20 +106,32 @@ const PickingWaves = () => {
         <TableBody>
           {pickingWaves.map(pw => {
             return (
-              <ExpansionPanel square className={classes.root}>
+              <ExpansionPanel key={pw.id} square className={classes.root}>
                 <ExpansionPanelSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1a-content"
                   id="panel1a-header"
                 >
                   <Typography className={classes.heading}>{pw.id}</Typography>
+                  {pw.state === "OPEN" ? (
+                    <Button
+                      className={classes.button}
+                      onClick={e => e.stopPropagation()}
+                      variant="contained"
+                      color="primary"
+                    >
+                      Start picking
+                    </Button>
+                  ) : (
+                    ""
+                  )}
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <Table className={classes.table} aria-label="simple table">
                     <TableBody>
                       {pw.products.map(item => {
                         return (
-                          <TableRow key={item.key}>
+                          <TableRow key={"" + item.key + pw.id + item.sale}>
                             <TableCell
                               component="th"
                               scope="row"
@@ -129,7 +143,7 @@ const PickingWaves = () => {
                                   onFocus={event => event.stopPropagation()}
                                   control={<Checkbox color="primary" />}
                                   onChange={handleToggle(
-                                    250,
+                                    item.pickedQuantity,
                                     item.sale,
                                     item.index,
                                   )}
@@ -137,7 +151,7 @@ const PickingWaves = () => {
                                   checked={selected.some(e =>
                                     e.equals(
                                       new Selection(
-                                        250,
+                                        item.pickedQuantity,
                                         item.sale,
                                         item.index,
                                       )
@@ -169,6 +183,11 @@ const PickingWaves = () => {
                                     ""
                                   )}
                               </FormHelperText> */}
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="overline">
+                                {item.sale}
+                              </Typography>
                             </TableCell>
                             <TableCell align="right">
                               Quantity {item.quantity}

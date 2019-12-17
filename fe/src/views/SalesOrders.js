@@ -1,10 +1,8 @@
-import React from "react"
+import React from "react";
 import Paperbase from "../theme/Paperbase";
 
-const SalesOrders = () => {
-    return (
-        <Paperbase selecteditem="Sales Orders"/>
-    );
-}
+const SalesOrders = props => {
+  return <Paperbase route={props} selecteditem="Sales Orders" />;
+};
 
 export default SalesOrders;
