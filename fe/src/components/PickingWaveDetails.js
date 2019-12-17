@@ -11,7 +11,7 @@ import { CircularProgress, Button, TextField } from "@material-ui/core";
 const columns = [
     { id: 'products', label: 'Products', minWidth: 100, align: 'left' },
     { id: 'warehouse', label: 'Warehouse', minWidth: 100, align: 'center' },
-    { id: 'quantity', label: 'Quantity', minWidth: 100, align: 'center' },
+    { id: 'missingQuantity', label: 'Missing\u00a0Quantity', minWidth: 100, align: 'center' },
     { id: 'pickedQuantity', label: 'Picked\u00a0Quantity', minWidth: 100, align: 'center' },
 ];
 
@@ -71,8 +71,9 @@ const PickingWaveDetails = props => {
                 </TableHead>
                 <TableBody style={{backgroundColor:"white"}}>
                     {pickingWave.products.map(product => {
+                        let missingQuant = product.quantity - product.pickedQuantity - product.shippedQuantity;
                         return(
-                            <TableRow key={product.description}>    
+                            <TableRow key={product.description}>
                                 <TableCell component="th" scope="row">
                                     {product.description}
                                 </TableCell>
@@ -80,11 +81,11 @@ const PickingWaveDetails = props => {
                                     {product.warehouse}
                                 </TableCell>
                                 <TableCell align="center">
-                                    Quantity: {product.quantity}
+                                    {missingQuant}
                                 </TableCell>
                                 <TableCell align="right">
                                     <TextField
-                                        label="Enter Quantity Picked"
+                                        label="Enter Picked Quantity"
                                         name="quantity"
                                         type="text"
                                         onChange={e =>
