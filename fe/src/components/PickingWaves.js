@@ -11,8 +11,15 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import axios from "axios";
-import { CircularProgress, Button, FormControlLabel, Checkbox, FormHelperText } from "@material-ui/core";
-
+import {
+  CircularProgress,
+  Button,
+  FormControlLabel,
+  Checkbox,
+  Link as LinkMui,
+  FormHelperText
+} from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles({
   root: {
@@ -25,8 +32,9 @@ const useStyles = makeStyles({
       content: '"PickingWave#"'
     }
   },
-  button: {
-    marginLeft: "auto"
+  link: {
+    marginLeft: "auto",
+    textDecoration: "none"
   }
 });
 
@@ -34,7 +42,7 @@ class Selection {
   constructor(quantity, sourceDocKey, sourceDocLineNumber) {
     this.quantity = quantity;
     this.sourceDocKey = sourceDocKey;
-    this.sourceDocLineNumber = sourceDocLineNumber
+    this.sourceDocLineNumber = sourceDocLineNumber;
   }
 
   equals(other) {
@@ -81,8 +89,8 @@ const PickingWaves = () => {
     sourceDocLineNumber
   ) => event => {
     const s = new Selection(quantity, sourceDocKey, sourceDocLineNumber);
-    for(let i = 0; i < selected.length; i++){
-      if(selected[i].equals(s)) {
+    for (let i = 0; i < selected.length; i++) {
+      if (selected[i].equals(s)) {
         selected.splice(i, 1);
         setTotalSelected(totalSelected - 1);
         return;
@@ -91,10 +99,10 @@ const PickingWaves = () => {
     selected.push(s);
     
     setTotalSelected(totalSelected + 1);
-  }
+  };
 
   const handlePickingWaves = event => {
-
+    
     axios.get("http://localhost:3001/sales/orders").then(r => {
       setProcessGoodsLoading(false);
       let processes = [];
@@ -109,11 +117,11 @@ const PickingWaves = () => {
         if(res.status === 200){
           console.log(res);
         }
-      })
+      });
 
     setTotalProcessGoods(totalProcessGoods + 1);
     setSelected([]);
-    setTotalSelected(0);   
+    setTotalSelected(0);
   };
 
   if (pickingWavesLoading && processGoodsLoading) return <CircularProgress />;
@@ -136,14 +144,15 @@ const PickingWaves = () => {
                 >
                   <Typography className={classes.heading}>{pw.id}</Typography>
                   {pw.state === "OPEN" ? (
-                    <Button
-                      className={classes.button}
+                    <Link
+                      className={classes.link}
+                      to={`/pickingWaves/${pw.id}`}
                       onClick={e => e.stopPropagation()}
-                      variant="contained"
-                      color="primary"
                     >
-                      Start picking
-                    </Button>
+                      <LinkMui variant="contained" color="primary">
+                        Start picking
+                      </LinkMui>
+                    </Link>
                   ) : (
                     ""
                   )}
@@ -159,24 +168,24 @@ const PickingWaves = () => {
                               scope="row"
                               key={item.key}
                             >
-                               <FormControlLabel
-                                  aria-label="Acknowledge"
-                                  onClick={event => event.stopPropagation()}
-                                  onFocus={event => event.stopPropagation()}
-                                  control={<Checkbox color="primary" />}
-                                  onChange={handleToggle(
-                                    item.pickedQuantity,
-                                    item.sale,
-                                    item.index,
-                                  )}
-                                  label={item.description}
-                                  checked={selected.some(e =>
-                                    e.equals(
-                                      new Selection(
-                                        item.pickedQuantity,
-                                        item.sale,
-                                        item.index,
-                                      )
+                              <FormControlLabel
+                                aria-label="Acknowledge"
+                                onClick={event => event.stopPropagation()}
+                                onFocus={event => event.stopPropagation()}
+                                control={<Checkbox color="primary" />}
+                                onChange={handleToggle(
+                                  item.pickedQuantity,
+                                  item.sale,
+                                  item.index
+                                )}
+                                label={item.description}
+                                checked={selected.some(e =>
+                                  e.equals(
+                                    new Selection(
+                                      item.pickedQuantity,
+                                      item.sale,
+                                      item.index
+                                    )
                                     )
                                   )}
                                   disabled={
@@ -216,17 +225,17 @@ const PickingWaves = () => {
         </TableBody>
       </Table>
       <Typography variant="overline" display="block" gutterBottom>
-          {totalSelected} items selected
-        </Typography>
-        <Button
-          className={classes.button}
-          variant="contained"
-          color="primary"
-          onClick={handlePickingWaves}
-          disabled={totalSelected < 1}
-        >
-          Create Process Order
-        </Button>
+        {totalSelected} items selected
+      </Typography>
+      <Button
+        className={classes.button}
+        variant="contained"
+        color="primary"
+        onClick={handlePickingWaves}
+        disabled={totalSelected < 1}
+      >
+        Create Process Order
+      </Button>
     </React.Fragment>
   );
 };
