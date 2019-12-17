@@ -89,6 +89,13 @@ export default function StickyHeadTable() {
         }
       }
     }
+    for(let i = 0; i < tempWarehousesItems.length; i++){
+
+      if(tempWarehousesItems[i][1].length == 0 && tempWarehousesItems[i][0] !== "Entry" && tempWarehousesItems[i][0] !== "Exit"){
+        tempWarehousesItems.splice(i, 1);
+        i--;
+      }
+    }
     return tempWarehousesItems;
   }
 
