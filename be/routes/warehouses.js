@@ -83,7 +83,15 @@ router.post('/transfer', function(req, res, next) {
     
     transferItems(req.body)
     .then((r) => {
-        res.json(r.data);
+        items()
+        .then(async (r) => {
+            let ret = await(parseWarehousesItems(r.data))
+            res.json(ret);
+        })
+        .catch((e) => {
+            res.json(e);
+        });
+
     })
     .catch((e) => {
         res.json(e);

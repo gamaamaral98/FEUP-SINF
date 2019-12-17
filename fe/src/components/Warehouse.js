@@ -62,25 +62,7 @@ export default function StickyHeadTable() {
       .then((res) => {
 
         setWarehousesItemsLoading(false);
-
-        let tempWarehousesItems = [];
-        for(let i = 0; i < warehouses.length; i++){
-
-          tempWarehousesItems.push([warehouses[i], []]);
-        }
-        for(let i = 0; i < res.data.data.length; i++){
-          for(let k = 0; k < tempWarehousesItems.length; k++){
-            if(tempWarehousesItems[k][0] === res.data.data[i][4]){
-
-              let itemID = res.data.data[i][0];
-              let description = res.data.data[i][1];
-              let targetWarehouse = res.data.data[i][2];
-              let stockBalance = res.data.data[i][3];
-              tempWarehousesItems[k][1].push([itemID, description, stockBalance, targetWarehouse]);
-            }
-          }
-        }
-
+        let tempWarehousesItems = handleWarehousesItems(res.data.data);
         setWarehousesItems(tempWarehousesItems);
       })
       .catch((_) => {
@@ -88,13 +70,39 @@ export default function StickyHeadTable() {
       })
   }, [warehouses]);
 
+  function handleWarehousesItems(newWarehousesItems){
+
+    let tempWarehousesItems = [];
+    for(let i = 0; i < warehouses.length; i++){
+
+      tempWarehousesItems.push([warehouses[i], []]);
+    }
+    for(let i = 0; i < newWarehousesItems.length; i++){
+      for(let k = 0; k < tempWarehousesItems.length; k++){
+        if(tempWarehousesItems[k][0] === newWarehousesItems[i][4]){
+
+          let itemID = newWarehousesItems[i][0];
+          let description = newWarehousesItems[i][1];
+          let targetWarehouse = newWarehousesItems[i][2];
+          let stockBalance = newWarehousesItems[i][3];
+          tempWarehousesItems[k][1].push([itemID, description, stockBalance, targetWarehouse]);
+        }
+      }
+    }
+    return tempWarehousesItems;
+  }
+
   function handleWarehouseTransfers(event, itemKey, targetWarehouse){
     event.preventDefault();
     const quantity = parseInt(event.target.quantity.value);
 
     axios.post(`http://localhost:3001/warehouses/transfer`, {company:"DUDA", sourceWarehouse:"01", targetWarehouse:targetWarehouse, UnloadingCountry:"PT", documentLines:[{materialsItem:itemKey, quantity:quantity}]})
       .then((res) => {
-        console.log(res);
+        if(res.status === 200){
+
+          let tempWarehousesItems = handleWarehousesItems(res.data.data);
+          setWarehousesItems(tempWarehousesItems);
+        }
       })
       .catch((e) => {
         console.log(e);
