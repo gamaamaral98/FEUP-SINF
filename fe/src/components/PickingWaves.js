@@ -39,10 +39,12 @@ const useStyles = makeStyles({
 });
 
 class Selection {
-  constructor(quantity, sourceDocKey, sourceDocLineNumber) {
+  constructor(quantity, sourceDocKey, sourceDocLineNumber, key, pickingWave) {
     this.quantity = quantity;
     this.sourceDocKey = sourceDocKey;
     this.sourceDocLineNumber = sourceDocLineNumber;
+    this.key = key;
+    this.pickingWave = pickingWave;
   }
 
   equals(other) {
@@ -86,9 +88,11 @@ const PickingWaves = () => {
   const handleToggle = (
     quantity,
     sourceDocKey,
-    sourceDocLineNumber
+    sourceDocLineNumber,
+    key,
+    pickingWave
   ) => event => {
-    const s = new Selection(quantity, sourceDocKey, sourceDocLineNumber);
+    const s = new Selection(quantity, sourceDocKey, sourceDocLineNumber, key, pickingWave);
     for (let i = 0; i < selected.length; i++) {
       if (selected[i].equals(s)) {
         selected.splice(i, 1);
@@ -102,22 +106,28 @@ const PickingWaves = () => {
   };
 
   const handlePickingWaves = event => {
-    axios.get("http://localhost:3001/sales/orders").then(r => {
-      setProcessGoodsLoading(false);
-      let processes = [];
-      for (let i = 0; i < r.data.data.length; i++) {
-        processes.push(r.data.data[i]);
-      }
-      setProcessGoods(processes);
-    });
+    console.log(selected)
+    // axios.get("http://localhost:3001/sales/orders").then(r => {
+    //   setProcessGoodsLoading(false);
+    //   let processes = [];
+    //   for (let i = 0; i < r.data.data.length; i++) {
+    //     processes.push(r.data.data[i]);
+    //   }
+    //   setProcessGoods(processes);
+    // });
 
-    axios
-      .post(`http://localhost:3001/sales/processOrders`, selected)
-      .then(res => {
-        if (res.status === 200) {
-          console.log(res);
-        }
-      });
+    // axios
+    //   .post(`http://localhost:3001/pickingWaves/processOrders`, selected)
+    //   .then(res => {
+    //     if (res.status === 200) {
+    //       console.log(res);
+    //     }
+    //   });
+
+    // for (let i = 0; i < selected.length; i++) {
+    //   axios.put(`http://localhost:3001/pickingWaves/processOrders`)
+    // }
+
 
     setTotalProcessGoods(totalProcessGoods + 1);
     setSelected([]);
@@ -170,9 +180,11 @@ const PickingWaves = () => {
                                 onFocus={event => event.stopPropagation()}
                                 control={<Checkbox color="primary" />}
                                 onChange={handleToggle(
-                                  item.pickedQuantity,
+                                  item.pickedQuantity - item.shippedQuantity,
                                   item.sale,
-                                  item.index
+                                  item.index,
+                                  item.key ,
+                                  item.pickingWave,
                                 )}
                                 label={item.description}
                                 checked={selected.some(e =>
@@ -189,16 +201,18 @@ const PickingWaves = () => {
                                     e =>
                                       e.sourceDoc === item.sale &&
                                       e.item === item.key
-                                  ) || item.pickedQuantity === 0
+                                  ) || item.pickedQuantity - item.shippedQuantity > 0
                                 }
                               />
                               <FormHelperText>
-                                {item.pickedQuantity === 0 ? (
+                                {item.pickedQuantity - item.shippedQuantity <= 0 ? (
                                   <Typography variant="caption">
                                     Items must be picked first!
                                   </Typography>
                                 ) : (
-                                  ""
+                                  <Typography variant="caption">
+                                    Items in Exit Warehouse: {item.pickedQuantity - item.shippedQuantity}
+                                  </Typography>
                                 )}
                               </FormHelperText>
                             </TableCell>
@@ -208,7 +222,7 @@ const PickingWaves = () => {
                               </Typography>
                             </TableCell>
                             <TableCell align="right">
-                              Quantity {item.quantity}
+                              Quantity: {item.quantity - item.pickedQuantity - item.shippedQuantity} <br></br>
                             </TableCell>
                           </TableRow>
                         );

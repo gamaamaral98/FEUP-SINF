@@ -15,12 +15,18 @@ const columns = [
 const PickingWaveDetails = props => {
     const [pickingWave, setPickingWave] = useState(null);
     const [pickingWaveLoading, setPickingWaveLoading] = useState(true);
+    const [picked] = useState({});
 
     useEffect(() => {
         axios
             .get(`http://localhost:3001/pickingWaves/${props.id}`)
             .then(r => {
                 setPickingWave({ ...r.data });
+                for (let product in r.data.products) {
+                    product = r.data.products[product];
+                    if (!picked[product.key]) picked[product.key] = {};
+                    picked[product.key][product.sale] = 0;
+                }
                 setPickingWaveLoading(false);
             })
             .catch(() => setPickingWaveLoading(false));
@@ -28,6 +34,17 @@ const PickingWaveDetails = props => {
 
     const handleFinishPicking = event => {
         event.preventDefault();
+        let data = { data: [] };
+        for (let key in picked) {
+            for (let s in picked[key]) {
+                data.data.push({
+                    key: key,
+                    sale: s,
+                    pickedQuantity: picked[key][s]
+                });
+            }
+        }
+        axios.put(`http://localhost:3001/pickingWaves/${props.id}`, data);
     };
 
     if (pickingWaveLoading) return <CircularProgress />;
@@ -64,17 +81,13 @@ const PickingWaveDetails = props => {
                                         label="Enter Quantity Picked"
                                         name="quantity"
                                         type="text"
+                                        onChange={e =>
+                                            (picked[product.key][product.sale] =
+                                                e.target.value)
+                                        }
                                     />
                                 </TableCell>
                             </TableRow>
-                            {/* <CheckQuantity
-                                productKey={product["key"]}
-                                description={product["description"]}
-                                pickedQuantity={product["pickedQuantity"]}
-                                quantity={product["quantity"]}
-                                sale={product["sale"]}
-                                warehouse={product["warehouse"]}
-                            /> */}
                         </TableRow>
                     ))}
                 </TableBody>
