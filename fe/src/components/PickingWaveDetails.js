@@ -70,9 +70,8 @@ const PickingWaveDetails = props => {
                 </TableRow>
                 </TableHead>
                 <TableBody style={{backgroundColor:"white"}}>
-                    {pickingWave.products.map(product => {
-                        let missingQuant = product.quantity - product.pickedQuantity;
-                        return(
+                    {pickingWave.products.map(product =>
+                        product.quantity - product.pickedQuantity !==0 ?
                             <TableRow key={product.description}>
                                 <TableCell component="th" scope="row">
                                     {product.description}
@@ -81,7 +80,7 @@ const PickingWaveDetails = props => {
                                     {product.warehouse}
                                 </TableCell>
                                 <TableCell align="center">
-                                    {missingQuant}
+                                    {product.quantity - product.pickedQuantity}
                                 </TableCell>
                                 <TableCell align="right">
                                     <TextField
@@ -93,9 +92,8 @@ const PickingWaveDetails = props => {
                                         }
                                     />
                                 </TableCell>
-                            </TableRow>
-                        );
-                    })}
+                            </TableRow> : ""
+                    )}
                 </TableBody>
             </Table>
             <form onSubmit={e => handleFinishPicking(e)}>
