@@ -29,7 +29,7 @@ const PickingWaveDetails = props => {
                 for (let product in r.data.products) {
                     product = r.data.products[product];
                     if (!picked[product.key]) picked[product.key] = {};
-                    picked[product.key][product.sale] = 0;
+                    picked[product.key][product.sale] = product.pickedQuantity;
                 }
                 setPickingWaveLoading(false);
             })
@@ -88,8 +88,7 @@ const PickingWaveDetails = props => {
                                         name="quantity"
                                         type="text"
                                         onChange={e =>
-                                            (picked[product.key][product.sale] =
-                                                e.target.value)
+                                            (picked[product.key][product.sale] = product.pickedQuantity + parseInt(e.target.value))
                                         }
                                     />
                                 </TableCell>

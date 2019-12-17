@@ -39,12 +39,13 @@ const useStyles = makeStyles({
 });
 
 class Selection {
-  constructor(quantity, sourceDocKey, sourceDocLineNumber, key, pickingWave) {
+  constructor(quantity, sourceDocKey, sourceDocLineNumber, key, pickingWave, shippedQuantity) {
     this.quantity = quantity;
     this.sourceDocKey = sourceDocKey;
     this.sourceDocLineNumber = sourceDocLineNumber;
     this.key = key;
     this.pickingWave = pickingWave;
+    this.shippedQuantity = shippedQuantity;
   }
 
   equals(other) {
@@ -90,9 +91,10 @@ const PickingWaves = () => {
     sourceDocKey,
     sourceDocLineNumber,
     key,
-    pickingWave
+    pickingWave,
+    shippedQuantity,
   ) => event => {
-    const s = new Selection(quantity, sourceDocKey, sourceDocLineNumber, key, pickingWave);
+    const s = new Selection(quantity, sourceDocKey, sourceDocLineNumber, key, pickingWave, shippedQuantity);
     for (let i = 0; i < selected.length; i++) {
       if (selected[i].equals(s)) {
         selected.splice(i, 1);
@@ -106,27 +108,29 @@ const PickingWaves = () => {
   };
 
   const handlePickingWaves = event => {
-    console.log(selected)
-    // axios.get("http://localhost:3001/sales/orders").then(r => {
-    //   setProcessGoodsLoading(false);
-    //   let processes = [];
-    //   for (let i = 0; i < r.data.data.length; i++) {
-    //     processes.push(r.data.data[i]);
-    //   }
-    //   setProcessGoods(processes);
-    // });
+    axios.get("http://localhost:3001/sales/orders").then(r => {
+      setProcessGoodsLoading(false);
+      let processes = [];
+      for (let i = 0; i < r.data.data.length; i++) {
+        processes.push(r.data.data[i]);
+      }
+      setProcessGoods(processes);
+    });
 
-    // axios
-    //   .post(`http://localhost:3001/pickingWaves/processOrders`, selected)
-    //   .then(res => {
-    //     if (res.status === 200) {
-    //       console.log(res);
-    //     }
-    //   });
+    axios
+      .post(`http://localhost:3001/pickingWaves/processOrders`, selected)
+      .then(res => {
+        if (res.status === 200) {
+          console.log(res);
+        }
+      });
 
-    // for (let i = 0; i < selected.length; i++) {
-    //   axios.put(`http://localhost:3001/pickingWaves/processOrders`)
-    // }
+    for (let i = 0; i < selected.length; i++) {
+      const s = selected[i];
+      axios.put(`http://localhost:3001/pickingWaves/${s.pickingWave}/${s.key}/${s.sale}`, {
+        shippedQuantity: s.shippedQuantity+s.quantity
+      })
+    }
 
 
     setTotalProcessGoods(totalProcessGoods + 1);
@@ -184,7 +188,8 @@ const PickingWaves = () => {
                                   item.sale,
                                   item.index,
                                   item.key ,
-                                  item.pickingWave,
+                                  pw.id,
+                                  item.shippedQuantity
                                 )}
                                 label={item.description}
                                 checked={selected.some(e =>
@@ -201,7 +206,7 @@ const PickingWaves = () => {
                                     e =>
                                       e.sourceDoc === item.sale &&
                                       e.item === item.key
-                                  ) || item.pickedQuantity - item.shippedQuantity > 0
+                                  ) || item.pickedQuantity <= item.shippedQuantity
                                 }
                               />
                               <FormHelperText>
