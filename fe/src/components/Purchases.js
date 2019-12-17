@@ -69,7 +69,6 @@ export default function StickyHeadTable() {
 
 
   function handleGenerateGoodsReceipt(event, naturalKey, item){
-    console.log("HELLO");
     event.preventDefault();
     const quantity = parseInt(event.target.quantity.value);
 
