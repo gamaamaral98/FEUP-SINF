@@ -165,6 +165,7 @@ export default function StickyHeadTable() {
           </TableHead>
           <TableBody>
             {sales.map(sale => {
+              console.log(sales);
               return (
                 <ExpansionPanel square className={classes.root}>
                   <ExpansionPanelSummary

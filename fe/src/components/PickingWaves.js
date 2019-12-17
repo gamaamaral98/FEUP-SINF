@@ -11,7 +11,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import axios from "axios";
-import { CircularProgress, Button, FormControlLabel, Checkbox } from "@material-ui/core";
+import { CircularProgress, Button, FormControlLabel, Checkbox, FormHelperText } from "@material-ui/core";
 
 
 const useStyles = makeStyles({
@@ -54,9 +54,21 @@ const PickingWaves = () => {
   const [selected, setSelected] = useState([]);
   const [totalProcessGoods, setTotalProcessGoods] = useState(0);
   const [processGoods, setProcessGoods] = useState([]);
+  const [processGoodsLoading, setProcessGoodsLoading] = useState(true);
 
   useEffect(() => {
     setPickingWavesLoading(true);
+    setProcessGoodsLoading(true);
+
+    axios.get("http://localhost:3001/sales/orders").then(r => {
+      setProcessGoodsLoading(false);
+      let processes = [];
+      for(let i = 0; i < r.data.data.length; i++){
+        processes.push(r.data.data[i]);
+      }
+      setProcessGoods(processes);
+    });
+
     axios.get("http://localhost:3001/pickingWaves").then(r => {
       setPickingWavesLoading(false);
       setPickingWaves(r.data);
@@ -77,11 +89,21 @@ const PickingWaves = () => {
       }
     }
     selected.push(s);
+    
     setTotalSelected(totalSelected + 1);
   }
 
   const handlePickingWaves = event => {
-    console.log(selected);
+
+    axios.get("http://localhost:3001/sales/orders").then(r => {
+      setProcessGoodsLoading(false);
+      let processes = [];
+      for(let i = 0; i < r.data.data.length; i++){
+        processes.push(r.data.data[i]);
+      }
+      setProcessGoods(processes);
+    });
+
     axios.post(`http://localhost:3001/sales/processOrders`, selected)
       .then((res) => {
         if(res.status === 200){
@@ -94,7 +116,7 @@ const PickingWaves = () => {
     setTotalSelected(0);   
   };
 
-  if (pickingWavesLoading) return <CircularProgress />;
+  if (pickingWavesLoading && processGoodsLoading) return <CircularProgress />;
   return (
     <React.Fragment>
       <Table stickyHeader aria-label="sticky table">
@@ -158,31 +180,21 @@ const PickingWaves = () => {
                                     )
                                   )}
                                   disabled={
-                                    item.quantity === item.pickedQuantity
-                                    // processGoods.some(e =>
-                                    //   e.products.some(
-                                    //     p =>
-                                    //       p.key === item.salesItem &&
-                                    //       p.sale === sale.naturalKey
-                                    //   )
-                                    // )
+                                    !(processGoods.some(e =>
+                                      e.sourceDoc === item.sale &&
+                                      e.item === item.key
+                                    )) || item.pickedQuantity === 0
                                   }
                                 />
-                                {/* <FormHelperText>
-                                  {processGoods.some(e =>
-                                    e.products.some(
-                                      p =>
-                                        p.key === item.salesItem &&
-                                        p.sale === sale.naturalKey
-                                    )
-                                  ) ? (
+                              <FormHelperText>
+                                  {item.pickedQuantity === 0 ? (
                                     <Typography variant="caption">
-                                      Already generated process order
+                                      Items must be picked first!
                                     </Typography>
                                   ) : (
                                     ""
                                   )}
-                              </FormHelperText> */}
+                              </FormHelperText>
                             </TableCell>
                             <TableCell>
                               <Typography variant="overline">

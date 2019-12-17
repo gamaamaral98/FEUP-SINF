@@ -11,7 +11,7 @@ router.post("/", function(req, res, next) {
         quantity: e.quantity,
         sale: e.sale,
         warehouse: e.warehouse,
-        index: e.index
+        index: e.index,
       }).then(p => pw.addProduct(p));
     });
   });
@@ -37,7 +37,8 @@ router.get("/", async function(req, res, next) {
           pickedQuantity: p.pickedQuantity,
           sale: p.sale,
           warehouse: p.warehouse,
-          index: p.index
+          index: p.index,
+          shippedQuantity: p.shippedQuantity,
         })
       );
 
