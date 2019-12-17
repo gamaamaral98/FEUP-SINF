@@ -17,34 +17,49 @@ router.post("/", function(req, res, next) {
   });
 });
 
+const parsePickingWave = async pw => {
+  let data = {
+    id: pw.id,
+    state: pw.state,
+    products: []
+  };
+
+  let ps = await pw.getProducts();
+  ps.map(p =>
+    data.products.push({
+      key: p.key,
+      description: p.description,
+      quantity: p.quantity,
+      pickedQuantity: p.pickedQuantity,
+      sale: p.sale,
+      warehouse: p.warehouse,
+      index: p.index
+    })
+  );
+  return data;
+};
+
 router.get("/", async function(req, res, next) {
   let ret = [];
 
   let pws = await PickingWave.findAll();
   await Promise.all(
     pws.map(async pw => {
-      let data = {
-        id: pw.id,
-        state: pw.state,
-        products: []
-      };
-      let ps = await pw.getProducts();
-      ps.map(p =>
-        data.products.push({
-          key: p.key,
-          description: p.description,
-          quantity: p.quantity,
-          pickedQuantity: p.pickedQuantity,
-          sale: p.sale,
-          warehouse: p.warehouse,
-          index: p.index
-        })
-      );
-
+      let data = await parsePickingWave(pw);
       ret.push(data);
     })
   );
   res.json(ret);
+});
+
+router.get("/:id", async function(req, res, next) {
+  let pw = await PickingWave.findOne({ where: { id: req.params.id } });
+  if (!pw) {
+    next();
+    return;
+  }
+  let data = await parsePickingWave(pw);
+  res.json(data);
 });
 
 module.exports = router;
