@@ -6,6 +6,8 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
+import Snackbar from '@material-ui/core/Snackbar';
+import Slide from '@material-ui/core/Slide';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
@@ -26,6 +28,9 @@ const useStyles = makeStyles({
   },
 });
 
+function TransitionRight(props) {
+  return <Slide {...props} direction="right" />;
+}
 
 export default function StickyHeadTable() {
   const classes = useStyles();
@@ -35,6 +40,9 @@ export default function StickyHeadTable() {
   const [purchases, setPurchases] = useState(null);
   const [purchasesLoading, setPurchasesLoading] = useState(false);
   const [totalPurchases, setTotalPurchases] = useState(0);
+
+  const [open, setOpen] = React.useState(false);
+  const [transition, setTransition] = React.useState(undefined);
 
 
   useEffect(() => {
@@ -74,6 +82,9 @@ export default function StickyHeadTable() {
           }
           setTotalPurchases(res.data.recordCount);
           setPurchases(purchaseOrders);
+
+          setTransition(() => TransitionRight);
+          setOpen(true);
         }
       })
   };
@@ -103,6 +114,10 @@ export default function StickyHeadTable() {
       <TableCell align="right">Received: {received} of {quantity}</TableCell>
     </TableRow>;
   }
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -163,6 +178,15 @@ export default function StickyHeadTable() {
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
+        />
+        <Snackbar
+        open={open}
+        onClose={handleClose}
+        TransitionComponent={transition}
+        ContentProps={{
+          'aria-describedby': 'message-id',
+        }}
+        message={<span id="message-id">Goods Receipt generated with success!</span>}
         />
         </React.Fragment>
     );

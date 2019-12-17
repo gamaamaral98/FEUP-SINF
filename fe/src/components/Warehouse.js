@@ -6,6 +6,8 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Table from '@material-ui/core/Table';
+import Snackbar from '@material-ui/core/Snackbar';
+import Slide from '@material-ui/core/Slide';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
@@ -20,12 +22,15 @@ const columns = [
   { id: 'products', label: 'Products', minWidth: 100 },
 ];
 
-
 const useStyles = makeStyles({
   root: {
     width: '100%',
   },
 });
+
+function TransitionRight(props) {
+  return <Slide {...props} direction="right" />;
+}
 
 export default function StickyHeadTable() {
 
@@ -38,6 +43,9 @@ export default function StickyHeadTable() {
 
   const [warehousesItems, setWarehousesItems] = useState(null);
   const [warehousesItemsLoading, setWarehousesItemsLoading] = useState(false);
+
+  const [open, setOpen] = React.useState(false);
+  const [transition, setTransition] = React.useState(undefined);
 
   useEffect(() => {
 
@@ -62,25 +70,7 @@ export default function StickyHeadTable() {
       .then((res) => {
 
         setWarehousesItemsLoading(false);
-
-        let tempWarehousesItems = [];
-        for(let i = 0; i < warehouses.length; i++){
-
-          tempWarehousesItems.push([warehouses[i], []]);
-        }
-        for(let i = 0; i < res.data.data.length; i++){
-          for(let k = 0; k < tempWarehousesItems.length; k++){
-            if(tempWarehousesItems[k][0] === res.data.data[i][4]){
-
-              let itemID = res.data.data[i][0];
-              let description = res.data.data[i][1];
-              let targetWarehouse = res.data.data[i][2];
-              let stockBalance = res.data.data[i][3];
-              tempWarehousesItems[k][1].push([itemID, description, stockBalance, targetWarehouse]);
-            }
-          }
-        }
-
+        let tempWarehousesItems = handleWarehousesItems(res.data.data);
         setWarehousesItems(tempWarehousesItems);
       })
       .catch((_) => {
@@ -88,13 +78,48 @@ export default function StickyHeadTable() {
       })
   }, [warehouses]);
 
+  function handleWarehousesItems(newWarehousesItems){
+
+    let tempWarehousesItems = [];
+    for(let i = 0; i < warehouses.length; i++){
+
+      tempWarehousesItems.push([warehouses[i], []]);
+    }
+    for(let i = 0; i < newWarehousesItems.length; i++){
+      for(let k = 0; k < tempWarehousesItems.length; k++){
+        if(tempWarehousesItems[k][0] === newWarehousesItems[i][4]){
+
+          let itemID = newWarehousesItems[i][0];
+          let description = newWarehousesItems[i][1];
+          let targetWarehouse = newWarehousesItems[i][2];
+          let stockBalance = newWarehousesItems[i][3];
+          tempWarehousesItems[k][1].push([itemID, description, stockBalance, targetWarehouse]);
+        }
+      }
+    }
+    for(let i = 0; i < tempWarehousesItems.length; i++){
+
+      if(tempWarehousesItems[i][1].length == 0 && tempWarehousesItems[i][0] !== "Entry" && tempWarehousesItems[i][0] !== "Exit"){
+        tempWarehousesItems.splice(i, 1);
+        i--;
+      }
+    }
+    return tempWarehousesItems;
+  }
+
   function handleWarehouseTransfers(event, itemKey, targetWarehouse){
     event.preventDefault();
     const quantity = parseInt(event.target.quantity.value);
 
     axios.post(`http://localhost:3001/warehouses/transfer`, {company:"DUDA", sourceWarehouse:"01", targetWarehouse:targetWarehouse, UnloadingCountry:"PT", documentLines:[{materialsItem:itemKey, quantity:quantity}]})
       .then((res) => {
-        console.log(res);
+        if(res.status === 200){
+
+          let tempWarehousesItems = handleWarehousesItems(res.data.data);
+          setWarehousesItems(tempWarehousesItems);
+          setTransition(() => TransitionRight);
+          setOpen(true);
+        }
       })
       .catch((e) => {
         console.log(e);
@@ -135,6 +160,10 @@ export default function StickyHeadTable() {
     }
   }
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -143,6 +172,7 @@ export default function StickyHeadTable() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
 
   if(warehousesItems === null) return(<CircularProgress/>)
   else
@@ -193,6 +223,15 @@ export default function StickyHeadTable() {
         page={page}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
+      <Snackbar
+      open={open}
+      onClose={handleClose}
+      TransitionComponent={transition}
+      ContentProps={{
+        'aria-describedby': 'message-id',
+      }}
+      message={<span id="message-id">Product Warehouse Transfer successful!</span>}
       />
     </React.Fragment>
   );
