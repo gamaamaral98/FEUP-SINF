@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
 import axios from "axios";
 import { CircularProgress, Typography } from "@material-ui/core";
 
@@ -7,15 +8,18 @@ const PickingWaveDetails = props => {
   const [pickingWaveLoading, setPickingWaveLoading] = useState(true);
 
   useEffect(() => {
-    setPickingWaveLoading(true);
-    axios.get(`http://localhost:3001/pickingWaves/${props.id}`).then(r => {
-      setPickingWaveLoading(false);
-      setPickingWave(r.data);
-    });
-  });
+    axios
+      .get(`http://localhost:3001/pickingWaves/${props.id}`)
+      .then(r => {
+        setPickingWave({ ...r.data });
+        setPickingWaveLoading(false);
+      })
+      .catch(() => setPickingWaveLoading(false));
+  }, [props.id]);
 
   if (pickingWaveLoading) return <CircularProgress />;
-  return <Typography>{pickingWave}</Typography>;
+  if (!pickingWave) return <Redirect to="/404" />;
+  return <Typography>{pickingWave.toString()}</Typography>;
 };
 
 export default PickingWaveDetails;
