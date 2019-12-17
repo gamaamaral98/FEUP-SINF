@@ -6,6 +6,7 @@ module.exports = (sequelize, type) => {
     pickedQuantity: { type: type.INTEGER, defaultValue: 0 },
     sale: { type: type.INTEGER, allowNull: false },
     warehouse: { type: type.STRING, allowNull: false },
-    index: { type: type.INTEGER, allowNull: false }
+    index: { type: type.INTEGER, allowNull: false },
+    shippedQuantity: { type: type.INTEGER, defaultValue: 0 }
   });
 };

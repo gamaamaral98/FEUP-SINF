@@ -8,15 +8,14 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Table from "@material-ui/core/Table";
-import Snackbar from '@material-ui/core/Snackbar';
-import Slide from '@material-ui/core/Slide';
+import Snackbar from "@material-ui/core/Snackbar";
+import Slide from "@material-ui/core/Slide";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import { CircularProgress, Button, FormHelperText } from "@material-ui/core";
-
 
 const axios = require("axios").default;
 
@@ -299,13 +298,15 @@ export default function StickyHeadTable() {
           Create picking wave
         </Button>
         <Snackbar
-        open={open}
-        onClose={handleClose}
-        TransitionComponent={transition}
-        ContentProps={{
-          'aria-describedby': 'message-id',
-        }}
-        message={<span id="message-id">Picking Wave created with success!</span>}
+          open={open}
+          onClose={handleClose}
+          TransitionComponent={transition}
+          ContentProps={{
+            "aria-describedby": "message-id"
+          }}
+          message={
+            <span id="message-id">Picking Wave created with success!</span>
+          }
         />
       </React.Fragment>
     );

@@ -25,7 +25,8 @@ const parsePickingWave = async pw => {
   };
 
   let ps = await pw.getProducts();
-  ps.map(p =>
+  ps.map(p => {
+    if (p.pickedQuantity >= p.quantity) return;
     data.products.push({
       key: p.key,
       description: p.description,
@@ -34,8 +35,8 @@ const parsePickingWave = async pw => {
       sale: p.sale,
       warehouse: p.warehouse,
       index: p.index
-    })
-  );
+    });
+  });
   return data;
 };
 
@@ -46,6 +47,7 @@ router.get("/", async function(req, res, next) {
   await Promise.all(
     pws.map(async pw => {
       let data = await parsePickingWave(pw);
+      if (data.products.length == 0) return;
       ret.push(data);
     })
   );
