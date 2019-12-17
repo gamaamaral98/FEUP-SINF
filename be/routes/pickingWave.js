@@ -84,8 +84,9 @@ router.put("/:id", async function(req, res, next) {
 });
 
 router.put("/:id/:key/:sale", async function(req, res, next) {
+    console.log(req.params, req.body.data)
     await Product.update(
-        { shippedQuantity: req.body.data.shippedQuantity },
+        { shippedQuantity: req.body.shippedQuantity },
         {
             where: {
                 key: req.params.key,
