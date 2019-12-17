@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Redirect } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
@@ -84,7 +85,7 @@ const PickingWaves = () => {
       setPickingWavesLoading(false);
       setPickingWaves(r.data);
     });
-  }, []);
+  }, [totalProcessGoods]);
 
   const handleToggle = (
     quantity,
@@ -126,7 +127,6 @@ const PickingWaves = () => {
         shippedQuantity: s.shippedQuantity+s.quantity
       })
     }
-
 
     setTotalProcessGoods(totalProcessGoods + 1);
     setSelected([]);
