@@ -9,8 +9,12 @@ import axios from "axios";
 import { CircularProgress, Button, TextField } from "@material-ui/core";
 
 const columns = [
-    { id: "pickingWave", label: "Picking\u00a0Wave", minWidth: 170 }
+    { id: 'products', label: 'Products', minWidth: 100, align: 'left' },
+    { id: 'warehouse', label: 'Warehouse', minWidth: 100, align: 'center' },
+    { id: 'quantity', label: 'Quantity', minWidth: 100, align: 'center' },
+    { id: 'pickedQuantity', label: 'Picked\u00a0Quantity', minWidth: 100, align: 'center' },
 ];
+
 
 const PickingWaveDetails = props => {
     const [pickingWave, setPickingWave] = useState(null);
@@ -53,20 +57,22 @@ const PickingWaveDetails = props => {
         <React.Fragment>
             <Table stickyHeader aria-label="sticky table">
                 <TableHead>
-                    <TableRow>
+                <TableRow>
+                    {columns.map(column => (
                         <TableCell
-                            key={columns[0].id}
-                            align={columns[0].align}
-                            style={{ minWidth: columns[0].minWidth }}
+                            key={column.id}
+                            align={column.align}
+                            style={{ minWidth: column.minWidth }}
                         >
-                            PickingWave#{pickingWave["id"]}
+                            {column.label}
                         </TableCell>
-                    </TableRow>
+                    ))}
+                </TableRow>
                 </TableHead>
-                <TableBody>
-                    {pickingWave.products.map(product => (
-                        <TableRow>
-                            <TableRow key={product.description}>
+                <TableBody style={{backgroundColor:"white"}}>
+                    {pickingWave.products.map(product => {
+                        return(
+                            <TableRow key={product.description}>    
                                 <TableCell component="th" scope="row">
                                     {product.description}
                                 </TableCell>
@@ -88,8 +94,8 @@ const PickingWaveDetails = props => {
                                     />
                                 </TableCell>
                             </TableRow>
-                        </TableRow>
-                    ))}
+                        );
+                    })}
                 </TableBody>
             </Table>
             <form onSubmit={e => handleFinishPicking(e)}>
