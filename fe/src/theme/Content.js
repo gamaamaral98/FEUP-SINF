@@ -19,7 +19,12 @@ class Content extends React.Component {
     else if (selecteditem === "Purchase Orders") return <Purchases />;
     else if (selecteditem === "Picking Waves") {
       if (this.props.route.match.params.id) {
-        return <PickingWaveDetails route={this.props.route} />;
+        return (
+          <PickingWaveDetails
+            route={this.props.route}
+            id={this.props.route.match.params.id}
+          />
+        );
       } else {
         return <PickingWaves />;
       }
