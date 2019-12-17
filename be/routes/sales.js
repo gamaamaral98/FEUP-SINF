@@ -36,7 +36,7 @@ const parseSale = async sale => {
       let line = {
         salesItem: documentLine.salesItem,
         description: documentLine.description,
-        quantity: documentLine.quantity,
+        quantity: documentLine.quantity - documentLine.deliveredQuantity,
         warehouse: warehouse.description,
         stockBalance: warehouse.stockBalance,
         enoughStock: warehouse.stockBalance >= documentLine.quantity,
@@ -70,7 +70,7 @@ const parseShip = async ship => {
   let ret = {
     sourceDoc: "",
     item: "",
-    quantity: 0,
+    quantity: 0
   };
 
   await Promise.all(
@@ -85,7 +85,7 @@ const parseShip = async ship => {
 
 const parseShipping = async data => {
   let ret = {
-    data: [],
+    data: []
   };
 
   for (key in data) {
@@ -102,7 +102,7 @@ const postProcessOrder = data => {
 
 const getShippingDeliveries = () => {
   return get(url + "/shipping/deliveries");
-}
+};
 
 router.get("/page=:page&pageSize=:pageSize", function(req, res, next) {
   salesPaginated({
@@ -122,40 +122,40 @@ router.get("/page=:page&pageSize=:pageSize", function(req, res, next) {
     });
 });
 
-router.post('/processOrders', function(req, res, next){
-    postProcessOrder(req.body)
-    .then((r) => {
-        res.json(r.data);
+router.post("/processOrders", function(req, res, next) {
+  postProcessOrder(req.body)
+    .then(r => {
+      res.json(r.data);
     })
     .catch(e => {
       res.json(e);
     });
 });
 
-router.get('/shipping', function(req, res, next){
+router.get("/shipping", function(req, res, next) {
   getShippingDeliveries()
-  .then(async r => {
-      try{
+    .then(async r => {
+      try {
         let ret = await parseShipping(r.data);
         res.json(ret);
       } catch (error) {
         console.log(error);
       }
-  })
-  .catch(e => {
-    res.json(e);
-  });
+    })
+    .catch(e => {
+      res.json(e);
+    });
 });
 
 const getProcessOrders = () => {
   return get(url + "/shipping/processOrders/1/50?company=DUDA");
-}
+};
 
 const parseOrder = async order => {
   console.log(order);
   let ret = {
     sourceDoc: "",
-    item: "",
+    item: ""
   };
 
   await Promise.all(
@@ -169,33 +169,33 @@ const parseOrder = async order => {
 
 const parseOrders = async data => {
   let ret = {
-    data: [],
+    data: []
   };
 
   for (key in data) {
     let obj = {
       sourceDoc: data[key].sourceDocKey,
-      item: data[key].item,
-    }
+      item: data[key].item
+    };
     ret.data.push(obj);
   }
 
   return ret;
 };
 
-router.get('/orders', function(req, res, next){
+router.get("/orders", function(req, res, next) {
   getProcessOrders()
-  .then(async r => {
-    try{
-      let ret = await parseOrders(r.data);
-      res.json(ret);
-    } catch (error) {
-      console.log(error);
-    }
-  })
-  .catch(e => {
-    res.json(e);
-  })
+    .then(async r => {
+      try {
+        let ret = await parseOrders(r.data);
+        res.json(ret);
+      } catch (error) {
+        console.log(error);
+      }
+    })
+    .catch(e => {
+      res.json(e);
+    });
 });
 
 module.exports = router;
